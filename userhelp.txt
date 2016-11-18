@@ -1,0 +1,60 @@
+General input format:
+
+<command> <optional:function name> <number>
+<command> <optional:function name> [ lowerbound , upperbound ]
+Note: Not entering a name is valid if an unnamed polynomial is created
+
+Commands:
+
+_Creating a polynomial - Creates a new function to use
+new <optional:function name> <polynomial input>
+	ex: new QuadraticOne x^2+3x-2
+	creates a polynomial of expression x^2+3x-2 named Quadratic one
+Note: This can and will overwrite polynomials of the same name
+
+_Outputting a value - Getting the value of the polynomial at a certain x
+	output <function name> <x value>
+	out <function name> <x value>
+	value <function name> <x value>
+ex: output QuadraticOne 2
+
+_Differentiating at a point - Gives the numerical derivative at a given x value 
+	differentiate <function name> <x value>
+	diff <function name> <x value>
+	d/dx <function name> <x value>
+	slope <function name> <x value>
+ex: diff QuadraticOne 0
+
+_Integrating over a bound - Returns the area under the curve over a given bound
+	integrate <function name> [lowerbound, upperbound]
+	inte <function name> [lowerbound, upperbound]
+	area <function name> [lowerbound, upperbound]
+ex: area QuadraticOne [0,5]
+
+_Zeroes - Finds the x values of any zeros in the bound given
+	zero <function name> [lowerbound, upperbound]
+	zeroes <function name> [lowerbound, upperbound]
+	intercepts <function name> [lowerbound, upperbound]
+ex: zero QuadraticOne [0,10]
+
+_Minimum and Maximum Values - Gives the minimum values and/or maximum values ofthe function within the bound given
+	min <function name> [lowerbound, upperbound]
+	minimum <function name> [lowerbound, upperbound]
+	max <function name> [lowerbound, upperbound]
+	maximum <function name> [lowerbound, upperbound]
+	extrema <function name> [lowerbound, upperbound]
+ex: min QuadraticOne [-1,7]
+max QuadraticOne [9,10]
+
+_Concavity - Find the concavity at a certain value of x
+	concavity <function name> <x value>
+	conc <function name> <x value>
+ex: concavity Quadratic 5
+
+_Combine polynomials - Creates a new polynomial to use by combining two others
+	combine <function1 name> <function 2 name> <optional:new function name>
+ex: combine QuadraticOne QuadraticTwo QuadraticSum
+
+_Plot - Plots the polynomial over given x and y bounds
+	plot <function name> [x minimum, x maximum] [y minimum, y maximum]
+ex: plot QuadraticOne [0,5] [-5,5]
