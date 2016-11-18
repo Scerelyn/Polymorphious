@@ -10,7 +10,7 @@ _Creating a polynomial - Creates a new function to use
 new <optional:function name> <polynomial input>
 	ex: new QuadraticOne x^2+3x-2
 	creates a polynomial of expression x^2+3x-2 named Quadratic one
-Note: This can and will overwrite polynomials of the same name
+Note: This can and will overwrite polynomials of the same name, and spaces should NOT be used
 
 _Outputting a value - Getting the value of the polynomial at a certain x
 	output <function name> <x value>
