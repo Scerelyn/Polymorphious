@@ -18,17 +18,18 @@ public class UserInterface {
 	public Polynomial createPolynomial(String input){
 		Polynomial poly = null; 
 		String[] splitInput = input.trim().split(" ");
-		if(splitInput.length != 3 || splitInput.length != 2){ //going to be strict here
+		System.out.println(splitInput.length);
+		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
 		}
 		if(splitInput.length == 2){
 			poly = new Polynomial("",splitInput[1]);
-			allPolys.remove( getPolynomialByName("") ); //overriding the polynomial, only one poly per name
+			allPolys.remove( getPolynomialByName("",true) ); //overriding the polynomial, only one poly per name
 			allPolys.add(poly);
 		}
 		else if(splitInput.length == 3){
 			poly = new Polynomial(splitInput[1],splitInput[2]);
-			allPolys.remove( getPolynomialByName(splitInput[1]) );
+			allPolys.remove( getPolynomialByName(splitInput[1],true) );
 			allPolys.add(poly);
 		}
 		else {
@@ -42,16 +43,22 @@ public class UserInterface {
 	 * 
 	 * @param name
 	 *            The name to search for
+	 * @param supressPrint
+	 *            Whether or not to suppress the error print out, as sometimes
+	 *            the null finding is a valid non error result
+	 * 
 	 * @return The matching polynomial. Returns null if no such polynomial us
 	 *         found
 	 */
-	public Polynomial getPolynomialByName(String name){
+	public Polynomial getPolynomialByName(String name, boolean suppressPrint){
 		for(Polynomial poly : allPolys){
 			if(poly.getName().equals(name)){
 				return poly;
 			}
 		}
-		System.out.println("No polynomial was found named: " + name);
+		if(!suppressPrint){
+			System.out.println("No polynomial was found named: " + name);
+		}
 		return null;
 	}
 	
@@ -64,7 +71,7 @@ public class UserInterface {
 	 */
 	public void printOutput(String input){
 		String[] splitInput = input.trim().split(" ");
-		if(splitInput.length != 3 || splitInput.length != 2){ //going to be strict here
+		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: output <name> <x value> or create <x value>");
 		}
 		double xVal;
@@ -77,9 +84,9 @@ public class UserInterface {
 		}
 		try{
 			if(splitInput.length >= 3){
-				poly = getPolynomialByName(splitInput[1]);
+				poly = getPolynomialByName(splitInput[1],false);
 			} else { //implied to be length of 2, or the exception is thrown beforehand
-				poly = getPolynomialByName("");
+				poly = getPolynomialByName("",false);
 			}
 			System.out.println( "The value of " + poly.toString() + " at x = " + xVal + " is "
 					+ poly.getFunc().output(xVal) );
@@ -96,7 +103,7 @@ public class UserInterface {
 	
 	public void printZero(String input){
 		String[] splitInput = input.split(" ");
-		if(splitInput.length != 3 || splitInput.length != 2){ //going to be strict here
+		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: zero <name> [LowerBound,UpperBound] or zero [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
@@ -104,10 +111,10 @@ public class UserInterface {
 		double lowerBound = 0;
 		double upperBound = 0;
 		if(splitInput.length == 3){
-			poly = getPolynomialByName(splitInput[1]);
+			poly = getPolynomialByName(splitInput[1],false);
 			boundString = splitInput[2];
 		} else {
-			poly = getPolynomialByName("");
+			poly = getPolynomialByName("",false);
 			boundString = splitInput[1];
 		}
 		try{
@@ -117,10 +124,13 @@ public class UserInterface {
 			System.out.println("Invalid bounds: " + boundString);
 		}
 		try{
-			System.out.println("A zero within the bounds has been found at: " + poly.findAZero(lowerBound, upperBound));
+			Double zeroLoc = poly.findAZero(lowerBound, upperBound);
+			if(zeroLoc != null){
+				System.out.println("A zero within the bounds has been found at: " + poly.findAZero(lowerBound, upperBound));
+			}
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
-				System.out.println("So polynomial by the name of: " + splitInput[1]);
+				System.out.println("No polynomial by the name of: " + splitInput[1]);
 			} else {
 				System.out.println("No default polynomial found");
 			}

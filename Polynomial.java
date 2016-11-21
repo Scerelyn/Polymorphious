@@ -14,7 +14,7 @@ public class Polynomial {
 	private final Function func;
 	private final String name; //these dont change
 	public final double DIFFERENTIAL_CONSTANT = 0.001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
-	public final double BASCALLY_ZERO = 0.0001; //how accurate a number should be to be considered "enough" or equal to zero
+	public final double BASICALLY_ZERO = 0.0001; //how accurate a number should be to be considered "enough" or equal to zero
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);
@@ -233,7 +233,7 @@ public class Polynomial {
 	 *            more accuracy
 	 * @return The x value of where the zero/root is located at
 	 */
-	public double findAZeroInBound(double lowerBound, double upperBound, int iterations){
+	public Double findAZeroInBound(double lowerBound, double upperBound, int iterations){
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
 		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
 			this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0){ //this checks for that in the lower half of the bound
@@ -249,11 +249,11 @@ public class Polynomial {
 			} else {
 				return findAZeroInBound(midPoint, upperBound, iterations-1);
 			}
-		} else if(midPointValue <= BASCALLY_ZERO){
+		} else if(midPointValue <= BASICALLY_ZERO){
 			return midPoint;
 		} else {
 			//System.out.println("No zeroes found within bound [" + lowerBound + "," + upperBound + "]");
-			return midPoint; //no idea what to return here :S
+			return null; //this is why i used Double and not double, because i need this extraneous value to use for checks
 		}
 	}
 
@@ -279,6 +279,9 @@ public class Polynomial {
 		}
 		//System.out.println("In: [" + lowerBound + "," + upperBound + "], subdiv: " + subDivisions);
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
+		if(midPointValue <= BASICALLY_ZERO){ //on the off chance that the zero is right on the midpoint
+			return new double[]{midPoint,midPoint};
+		}
 		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
 				this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0){
 			//System.out.println("Bounds found: [" + lowerBound + "," + midPoint + "]");
@@ -308,12 +311,12 @@ public class Polynomial {
 	 * Combines findAZeroInBound() and fundABoundWithAZero() into one method, because readability and ease
 	 * @return The x value where a zero was found
 	 */
-	public double findAZero(double lowerBound, double upperBound){
+	public Double findAZero(double lowerBound, double upperBound){
 		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		double[] bounds = findABoundWithAZero(lowerBound,upperBound,iterationCount);
 		if(bounds == null){
 			System.out.println("No zeroes found in bounds: [" + lowerBound + "," + upperBound + "]");
-			return 0;
+			return null;
 		}
 		return findAZeroInBound(bounds[0],bounds[1],iterationCount);
 	}
