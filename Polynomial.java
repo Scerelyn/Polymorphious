@@ -12,6 +12,7 @@ public class Polynomial {
 	private Function func;
 	private final String name;
 	public final double DIFFERENTIAL_CONSTANT = 0.001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
+	public final double BASCALLY_ZERO = 0.0001; //how accurate a number should be to be considered "enough" or equal
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);
@@ -201,6 +202,38 @@ public class Polynomial {
 	public double differentiate(double x){ //accurate up to six decimal places
 		return ( func.output(x + DIFFERENTIAL_CONSTANT) - func.output(x - DIFFERENTIAL_CONSTANT) ) / (2*DIFFERENTIAL_CONSTANT);
 	} //its basically the slope formula on a very small line
+	
+	/**
+	 * Finds a zero within the given bounds. Note: this defers to the root closest to zero if there are multiple roots within the bound
+	 * @param lower The lower bound to search in for a zero/root
+	 * @param upper The upper bound to seatch in for a zero/root
+	 * @param iterations The number of iterations to go through. More iterations gives more accuracy
+	 * @return The x value of where the zero/root is located at
+	 */
+	public double findZeroInBound(double lower, double upper, int iterations){
+		double midPoint = (lower + upper) / 2,  midPointValue = this.func.output(midPoint);
+		if(this.func.output(lower) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
+			this.func.output(lower) > 0 && this.func.output(midPoint) < 0){ //this checks for that in the lower half of the bound
+			if(iterations <= 0){
+				return midPoint;
+			} else {
+				return findZeroInBound(lower, midPoint, iterations-1);
+			}
+		} else if(this.func.output(lower) < 0 && this.func.output(midPoint) > 0 ||
+				this.func.output(lower) > 0 && this.func.output(midPoint) < 0){ //now for the upper half
+			if(iterations <= 0){
+				return midPointValue;
+			} else {
+				return findZeroInBound(midPoint, upper, iterations-1);
+			}
+		} else if(midPointValue <= BASCALLY_ZERO){
+			return midPoint;
+		} else {
+			System.out.println("No zeroes found within bound [" + lower + "," + upper + "]");
+			return midPoint; //no idea what to return here :S
+		}
+	}
+	
 	
 	@Override
 	public String toString(){
