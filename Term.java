@@ -23,7 +23,7 @@ public class Term{
 			return "0";
 		}
 		else if(termData[EXPONENT_INDEX] == 0){
-			return "1";
+			return "" + termData[CONSTANT_INDEX];
 		}
 		return  (termData[CONSTANT_INDEX] == -1 ? "-" : "") +
 				( (termData[CONSTANT_INDEX] == 1 && termData[EXPONENT_INDEX] != 0 || termData[CONSTANT_INDEX] == -1)  ? "" : termData[CONSTANT_INDEX]) + //if one and exponent is not zero or constant is -1, give empty string
