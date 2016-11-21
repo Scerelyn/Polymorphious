@@ -136,4 +136,38 @@ public class UserInterface {
 			}
 		}
 	}
+	
+	public void printIntegral(String input){
+		String[] splitInput = input.split(" ");
+		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
+			throw new IndexOutOfBoundsException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
+		}
+		Polynomial poly = null;
+		String boundString = "";
+		double lowerBound = 0;
+		double upperBound = 0;
+		if(splitInput.length == 3){
+			poly = getPolynomialByName(splitInput[1],false);
+			boundString = splitInput[2];
+		} else {
+			poly = getPolynomialByName("",false);
+			boundString = splitInput[1];
+		}
+		try{
+			lowerBound = Double.parseDouble( boundString.substring(1, boundString.indexOf(",")) );
+			upperBound = Double.parseDouble( boundString.substring(boundString.indexOf(",")+1, boundString.length()-1) );
+		} catch(NumberFormatException e){
+			System.out.println("Invalid bounds: " + boundString);
+		}
+		try{
+			double area = poly.simpsons(lowerBound, upperBound,200);
+			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + area);
+		} catch(NullPointerException e){
+			if(splitInput.length == 3){
+				System.out.println("No polynomial by the name of: " + splitInput[1]);
+			} else {
+				System.out.println("No default polynomial found");
+			}
+		}
+	}
 }

@@ -12,6 +12,7 @@ public class Mathy {
 		UI.createPolynomial("create Joey x^2-2x+1");
 		UI.printOutput("output Joey 1");
 		UI.printZero("zero Joey [-2,2]");
+		UI.printIntegral("integrate Joey [0,5]");
 	}
 
 }
