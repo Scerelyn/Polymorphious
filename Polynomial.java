@@ -12,8 +12,8 @@ public class Polynomial {
 	ArrayList<Term> termList = new ArrayList<Term>();
 	private final Function func;
 	private final String name; //these dont change
-	public final double DIFFERENTIAL_CONSTANT = 0.0001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
 	public final double BASICALLY_ZERO = 0.00001; //how accurate a number should be to be considered "enough" or equal to zero
+	
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);
@@ -25,6 +25,18 @@ public class Polynomial {
 			}
 			return answer;
 		};
+	}
+	
+	public Polynomial(String name, ArrayList<Term> terms){
+		this.name = name;
+		func = (double x) -> { //lambdas are really cool, letting me make methods like a datatype, sorta
+			double answer = 0;
+			for(Term t : termList){
+				answer += t.subInX(x);
+			}
+			return answer;
+		};
+		this.termList = terms;
 	}
 
 	/**
@@ -211,10 +223,10 @@ public class Polynomial {
 	/**
 	 * Finds the slope of the polynomial at a given value of x
 	 * @param x The value to find the slope on
-	 * @return The approximate slope at that point
+	 * @return The slope at that point
 	 */
 	public double differentiate(double x){ //accurate up to six decimal places
-		return ( func.output(x + DIFFERENTIAL_CONSTANT) - func.output(x - DIFFERENTIAL_CONSTANT) ) / (2*DIFFERENTIAL_CONSTANT);
+		return this.getDerivativePolynomial().getFunc().output(x);
 	} //its basically the slope formula on a very small line
 
 	/**
@@ -307,9 +319,13 @@ public class Polynomial {
 	}
 	
 	/**
-	 * Combines findAZeroInBound() and findABoundWithAZero() into one method, because readability and ease
+	 * Deprecated, this only finds the leftmost zero, whereas
+	 * findAllZerosInBound finds all of them. Combines findAZeroInBound() and
+	 * findABoundWithAZero() into one method, because readability and ease
+	 * 
 	 * @return The x value where a zero was found
 	 */
+	@Deprecated
 	public Double findAZero(double lowerBound, double upperBound){
 		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		double[] bounds = findABoundWithAZero(lowerBound,upperBound,iterationCount);
@@ -349,8 +365,10 @@ public class Polynomial {
 	 * zero finding, depending on bound length since a simple constant would
 	 * kill accuracy on large bounds.
 	 * 
-	 * @param lowerBound The lower bound to use
-	 * @param upperBound The upper bound to use
+	 * @param lowerBound
+	 *            The lower bound to use
+	 * @param upperBound
+	 *            The upper bound to use
 	 * @return The suitable iteration count to use with the given bounds
 	 */
 	public int findOptimalIterationCount(double lowerBound, double upperBound){
@@ -365,6 +383,26 @@ public class Polynomial {
 			iterationCount += 20; //iterations per digit
 		}
 		return iterationCount;
+	}
+	
+	/**
+	 * Creates and returns the algebraic derivative of the polynomial
+	 * 
+	 * @return A Polynomial object that is the derivative of the polynomial
+	 *         calling this method
+	 */
+	public Polynomial getDerivativePolynomial(){
+		ArrayList<Term> newTerms = new ArrayList<Term>();
+		for(Term t : this.termList){
+			if(t.getTermData()[Term.EXPONENT_INDEX] == 0){ //a constant
+				newTerms.add( new Term(0,0) );
+			} else {
+				newTerms.add( new Term(
+						t.getTermData()[Term.CONSTANT_INDEX]*t.getTermData()[Term.EXPONENT_INDEX],
+						t.getTermData()[Term.EXPONENT_INDEX]-1 ) ); //power rule, ezpz
+			}
+		}
+		return new Polynomial(this.getName() + "_Derivative",newTerms);
 	}
 	
 	@Override
