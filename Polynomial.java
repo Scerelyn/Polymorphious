@@ -270,6 +270,7 @@ public class Polynomial {
 	}
 
 	/**
+	 * Deprecated, no longer needed
 	 * Breaks down the given bound to search for zeros, and recurses to further
 	 * break down the bound, as the above with give false negatives if the
 	 * bounds are too big and a zero is within it. This is a substep method for
@@ -285,6 +286,7 @@ public class Polynomial {
 	 *         using findAZeroInBound() without a false negative. Returns null
 	 *         if no bounds with zeroes within them are given. Lower is index 0, upper is index 1
 	 */
+	@Deprecated
 	public double[] findABoundWithAZero(double lowerBound, double upperBound, int subDivisions){ //recursion is a mess to track, here is really bad
 		if(subDivisions < 0){ //no negatives
 			throw new IndexOutOfBoundsException("Negative Iteration count: " + subDivisions);
@@ -337,7 +339,15 @@ public class Polynomial {
 		return findAZeroInBound(bounds[0],bounds[1],iterationCount);
 	}
 	
-	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
+	/**
+	 * Depreciated, algorithm was very poor esp with multiple zeroes in the same bound
+	 * Finds all zeros within the given bound
+	 * @param lowerBound The lower bound to search from
+	 * @param upperBound The upper bound to search until
+	 * @return An arraylist containing double objects
+	 */
+	@Deprecated
+	public ArrayList<Double> findAllZeroesInBoundOld(double lowerBound, double upperBound){
 		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
 		Double zero = new Double(0.0); //using more nulls for checks
@@ -357,6 +367,35 @@ public class Polynomial {
 				}
 			}
 			lowerBound = zero + BASICALLY_ZERO;
+		}
+		return zeros;
+	}
+	
+	/**
+	 * Finds all zeroes within the given bound
+	 * @param lowerBound The lower bound to search from
+	 * @param upperBound The upper bound to search until
+	 * @return An array list containing Double objects
+	 */
+	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
+		double iterStep = Math.abs(upperBound - lowerBound) / 1000;
+		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
+		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
+		Double zero = new Double(0.0); //using more nulls for checks
+		double[] bounds = {};
+		while(lowerBound <= upperBound){ //one of these will happen and end the while loop
+			bounds = new double[]{lowerBound,lowerBound + iterStep};
+			zero = findAZeroInBound(bounds[0],bounds[1],iterationCount);
+			if(zero != null){ //zero isnt null
+				if(zeros.size() == 0 
+						|| (zeros.size() > 0 && !( Math.abs(zeros.get(zeros.size()-1)) - Math.abs(zero) <= BASICALLY_ZERO ))){ //no duplicates
+					zeros.add(zero);
+					lowerBound = zero + BASICALLY_ZERO;
+				}
+			} else {
+				lowerBound += iterStep;
+			}
+			
 		}
 		return zeros;
 	}
