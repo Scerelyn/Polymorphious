@@ -5,9 +5,10 @@ import java.util.*;
 
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
-	public final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
+	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
-	public static final DecimalFormat df = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
+	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
+	public static final DecimalFormat df2 = new DecimalFormat("0.##"); //for zeros, since for some reason they are quite inaccurate
 	
 	/**
 	 * Verifies and returns a Double from an input String
@@ -76,6 +77,7 @@ public class UserInterface {
 		else {
 			System.out.println("Invalid input, reenter and try again");
 		}
+		poly.sortIntoStandardOrder();
 		return poly;
 	}
 	
@@ -133,7 +135,7 @@ public class UserInterface {
 				poly = getPolynomialByName("",false);
 			}
 			System.out.println( "The value of " + poly.toString() + " at x = " + xVal + " is "
-					+ df.format( poly.getFunc().output(xVal) ) );
+					+ df3.format( poly.getFunc().output(xVal) ) );
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
 				System.out.println("No such polynomial by the name of: " + splitInput[1]);
@@ -164,9 +166,13 @@ public class UserInterface {
 			return;
 		}
 		try{
-			Double zeroLoc = poly.findAZero(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
-			if(zeroLoc != null){
-				System.out.println("A zero within the bounds has been found at: " + df.format( poly.findAZero(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]) ));
+			ArrayList<Double> zeros = poly.findAllZeroesInBound(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
+			if (!zeros.isEmpty()) {
+				System.out.print("Found zeros in bounds " + boundString + " at x values of: ");
+				for (Double d : zeros) {
+					System.out.print(df2.format(d) + ", ");
+				}
+				System.out.println();
 			}
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
@@ -203,7 +209,7 @@ public class UserInterface {
 		}
 		try{
 			double area = poly.simpsons(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX],200);
-			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + df.format(area));
+			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + df3.format(area));
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
 				System.out.println("No polynomial by the name of: " + splitInput[1]);
@@ -232,7 +238,7 @@ public class UserInterface {
 			return; //if the number fails to verify, end the method here
 		}
 		try{
-			System.out.println("The numerical derivative of " + poly.toString() + " at x = " + xVal + " is " + df.format( poly.differentiate(xVal) ));
+			System.out.println("The numerical derivative of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.differentiate(xVal) ));
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
 				System.out.println("No polynomial by the name of: " + splitInput[1]);

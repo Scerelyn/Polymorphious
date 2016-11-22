@@ -12,8 +12,8 @@ public class Polynomial {
 	ArrayList<Term> termList = new ArrayList<Term>();
 	private final Function func;
 	private final String name; //these dont change
-	public final double DIFFERENTIAL_CONSTANT = 0.001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
-	public final double BASICALLY_ZERO = 0.0001; //how accurate a number should be to be considered "enough" or equal to zero
+	public final double DIFFERENTIAL_CONSTANT = 0.0001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
+	public final double BASICALLY_ZERO = 0.00001; //how accurate a number should be to be considered "enough" or equal to zero
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);
@@ -278,7 +278,7 @@ public class Polynomial {
 		}
 		//System.out.println("In: [" + lowerBound + "," + upperBound + "], subdiv: " + subDivisions);
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
-		if(midPointValue <= BASICALLY_ZERO){ //on the off chance that the zero is right on the midpoint
+		if(midPointValue <= BASICALLY_ZERO && midPointValue >= 0){ //on the off chance that the zero is right on the midpoint
 			return new double[]{midPoint,midPoint};
 		}
 		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
@@ -307,7 +307,7 @@ public class Polynomial {
 	}
 	
 	/**
-	 * Combines findAZeroInBound() and fundABoundWithAZero() into one method, because readability and ease
+	 * Combines findAZeroInBound() and findABoundWithAZero() into one method, because readability and ease
 	 * @return The x value where a zero was found
 	 */
 	public Double findAZero(double lowerBound, double upperBound){
@@ -318,6 +318,30 @@ public class Polynomial {
 			return null;
 		}
 		return findAZeroInBound(bounds[0],bounds[1],iterationCount);
+	}
+	
+	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
+		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
+		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
+		Double zero = new Double(0.0); //using more nulls for checks
+		double[] bounds = {};
+		while(lowerBound <= upperBound && zero != null && bounds != null){ //one of these will happen and end the while loop
+			bounds = findABoundWithAZero(lowerBound,upperBound,iterationCount);
+			try{
+				zero = findAZeroInBound(bounds[0],bounds[1],iterationCount);
+			} catch(NullPointerException e){
+				//bounds is null, this ends the method
+				return zeros;
+			}
+			if(zero != null){ //zero isnt null
+				if(zeros.size() == 0 
+						|| (zeros.size() > 0 && !( Math.abs(zeros.get(zeros.size()-1)) - Math.abs(zero) <= BASICALLY_ZERO ))){ //no duplicates
+					zeros.add(zero);
+				}
+			}
+			lowerBound = bounds[1] + BASICALLY_ZERO;
+		}
+		return zeros;
 	}
 	
 	/**
@@ -338,7 +362,7 @@ public class Polynomial {
 		int iterationCount = 10; //at least ten iterations, the findAZeroInBound() will end prematurely if a zero is found, so too many isnt an issue
 		while(boundLengthNoDecimals > 10){
 			boundLengthNoDecimals %= 10;
-			iterationCount += 10; //10 iterations per digit
+			iterationCount += 20; //iterations per digit
 		}
 		return iterationCount;
 	}
