@@ -13,6 +13,7 @@ public class Mathy {
 		UI.printOutput("output Joey 1");
 		UI.printZero("zero Joey [-2,2]");
 		UI.printIntegral("integrate Joey [0,5]");
+		UI.printDerivative("derivative Joey 0");
 	}
 
 }

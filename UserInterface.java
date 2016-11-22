@@ -1,11 +1,52 @@
 package edu.neumont.csc110.EquationParsing;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
+	public final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
+	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
+	public static final DecimalFormat df = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	
-	ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
+	/**
+	 * Verifies and returns a Double from an input String
+	 * 
+	 * @param input
+	 *            The String to parse as the Double
+	 * @return A Double. Returns null if the number is invalid
+	 */
+	public Double verifyDouble(String input){
+		try{
+			return Double.parseDouble(input);
+		} catch(NumberFormatException e){
+			System.out.println("Invalid number input");
+			return null;
+		}
+	}
+	
+	/**
+	 * Verifies and returns a pair of valid doubles for a bound from an input
+	 * string
+	 * 
+	 * @param input
+	 *            The string to parse as a bound, input as: [double,double] ex:
+	 *            [1,2]
+	 * @return A double array with both validated doubles. Returns null if
+	 *         either number fails to validate
+	 */
+	public double[] verifyBounds(String input){
+		try{
+			double lowerBound = 0;
+			double upperBound = 0;
+			lowerBound = Double.parseDouble( input.substring(1, input.indexOf(",")) );
+			upperBound = Double.parseDouble( input.substring(input.indexOf(",")+1, input.length()-1) );
+			return new double[]{lowerBound,upperBound};
+		} catch(NumberFormatException e){
+			System.out.println("Invalid bounds: " + input);
+			return null;
+		}
+	}
 	
 	/**
 	 * Receives an create input string, assuming it is a valid create input, and
@@ -72,15 +113,18 @@ public class UserInterface {
 	public void printOutput(String input){
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: output <name> <x value> or create <x value>");
+			throw new IndexOutOfBoundsException("Invalid input string. Format should be: output <name> <x value> or output <x value>");
 		}
-		double xVal;
+		Double xVal = null; //using nulls for checks in validity. null = invalid number/input
+		if(splitInput.length == 3){
+			xVal = verifyDouble(splitInput[2]);
+		}
+		else {
+			xVal = verifyDouble(splitInput[1]);
+		}
 		Polynomial poly = null; //null and uninstantiated are for some odd reason different. you'd think uninstantiated would be null on default
-		try{
-			xVal = Double.parseDouble(splitInput[2]);
-		} catch(NumberFormatException e){
-			System.out.println("Invalid x value input: " + splitInput[2]);
-			return; //no point in continuing the method from here
+		if(xVal == null){
+			return; //if the number fails to verify, end the method here
 		}
 		try{
 			if(splitInput.length >= 3){
@@ -89,7 +133,7 @@ public class UserInterface {
 				poly = getPolynomialByName("",false);
 			}
 			System.out.println( "The value of " + poly.toString() + " at x = " + xVal + " is "
-					+ poly.getFunc().output(xVal) );
+					+ df.format( poly.getFunc().output(xVal) ) );
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
 				System.out.println("No such polynomial by the name of: " + splitInput[1]);
@@ -103,13 +147,11 @@ public class UserInterface {
 	
 	public void printZero(String input){
 		String[] splitInput = input.split(" ");
-		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
+		if(splitInput.length != 3 && splitInput.length != 2){
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: zero <name> [LowerBound,UpperBound] or zero [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		String boundString = "";
-		double lowerBound = 0;
-		double upperBound = 0;
 		if(splitInput.length == 3){
 			poly = getPolynomialByName(splitInput[1],false);
 			boundString = splitInput[2];
@@ -117,16 +159,14 @@ public class UserInterface {
 			poly = getPolynomialByName("",false);
 			boundString = splitInput[1];
 		}
-		try{
-			lowerBound = Double.parseDouble( boundString.substring(1, boundString.indexOf(",")) );
-			upperBound = Double.parseDouble( boundString.substring(boundString.indexOf(",")+1, boundString.length()-1) );
-		} catch(NumberFormatException e){
-			System.out.println("Invalid bounds: " + boundString);
+		double[] bounds = verifyBounds(boundString);
+		if(bounds == null){ //invalid bounds
+			return;
 		}
 		try{
-			Double zeroLoc = poly.findAZero(lowerBound, upperBound);
+			Double zeroLoc = poly.findAZero(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
 			if(zeroLoc != null){
-				System.out.println("A zero within the bounds has been found at: " + poly.findAZero(lowerBound, upperBound));
+				System.out.println("A zero within the bounds has been found at: " + df.format( poly.findAZero(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]) ));
 			}
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
@@ -137,15 +177,19 @@ public class UserInterface {
 		}
 	}
 	
+	/**
+	 * Gives the numerical integral of the given polynomial over given bounds
+	 * 
+	 * @param input
+	 *            The input string to parse and use
+	 */
 	public void printIntegral(String input){
 		String[] splitInput = input.split(" ");
-		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
+		if(splitInput.length != 3 && splitInput.length != 2){
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		String boundString = "";
-		double lowerBound = 0;
-		double upperBound = 0;
 		if(splitInput.length == 3){
 			poly = getPolynomialByName(splitInput[1],false);
 			boundString = splitInput[2];
@@ -153,15 +197,42 @@ public class UserInterface {
 			poly = getPolynomialByName("",false);
 			boundString = splitInput[1];
 		}
-		try{
-			lowerBound = Double.parseDouble( boundString.substring(1, boundString.indexOf(",")) );
-			upperBound = Double.parseDouble( boundString.substring(boundString.indexOf(",")+1, boundString.length()-1) );
-		} catch(NumberFormatException e){
-			System.out.println("Invalid bounds: " + boundString);
+		double[] bounds = verifyBounds(boundString);
+		if(bounds == null){ //invalid bounds
+			return;
 		}
 		try{
-			double area = poly.simpsons(lowerBound, upperBound,200);
-			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + area);
+			double area = poly.simpsons(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX],200);
+			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + df.format(area));
+		} catch(NullPointerException e){
+			if(splitInput.length == 3){
+				System.out.println("No polynomial by the name of: " + splitInput[1]);
+			} else {
+				System.out.println("No default polynomial found");
+			}
+		}
+	}
+	
+	public void printDerivative(String input){
+		String[] splitInput = input.split(" ");
+		if(splitInput.length != 3 && splitInput.length != 2){
+			throw new IndexOutOfBoundsException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
+		}
+		Polynomial poly = null;
+		Double xVal = null; //using nulls for checks in validity. null = invalid number/input
+		if(splitInput.length == 3){
+			xVal = verifyDouble(splitInput[2]);
+			poly = getPolynomialByName(splitInput[1],false);
+		}
+		else {
+			xVal = verifyDouble(splitInput[1]);
+			poly = getPolynomialByName("",false);
+		}
+		if(xVal == null){
+			return; //if the number fails to verify, end the method here
+		}
+		try{
+			System.out.println("The numerical derivative of " + poly.toString() + " at x = " + xVal + " is " + df.format( poly.differentiate(xVal) ));
 		} catch(NullPointerException e){
 			if(splitInput.length == 3){
 				System.out.println("No polynomial by the name of: " + splitInput[1]);

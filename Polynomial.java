@@ -10,7 +10,6 @@ public class Polynomial {
 	}
 	
 	ArrayList<Term> termList = new ArrayList<Term>();
-	DecimalFormat df = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	private final Function func;
 	private final String name; //these dont change
 	public final double DIFFERENTIAL_CONSTANT = 0.001; //refers to the "h" in the limit/approximation formula for differentiation. 0.001 gives decent accuracy
