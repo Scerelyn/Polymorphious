@@ -14,7 +14,7 @@ public class Term{
 	 * @return The value of the expression with x substituted
 	 */
 	public double subInX(double x){ 
-		return termData[CONSTANT_INDEX] * Math.pow(x, termData[EXPONENT_INDEX]);
+		return termData[CONSTANT_INDEX] * (Math.pow(x, termData[EXPONENT_INDEX]));
 	}
 	
 	@Override

@@ -12,7 +12,7 @@ public class Polynomial {
 	ArrayList<Term> termList = new ArrayList<Term>();
 	private final Function func;
 	private final String name; //these dont change
-	public final double BASICALLY_ZERO = 0.00001; //how accurate a number should be to be considered "enough" or equal to zero
+	public final double BASICALLY_ZERO = 0.001; //how accurate a number should be to be considered "enough" or equal to zero
 	
 	public Polynomial(String name, String str){
 		this.name = name;
@@ -29,7 +29,7 @@ public class Polynomial {
 	
 	public Polynomial(String name, ArrayList<Term> terms){
 		this.name = name;
-		func = (double x) -> { //lambdas are really cool, letting me make methods like a datatype, sorta
+		func = (double x) -> {
 			double answer = 0;
 			for(Term t : termList){
 				answer += t.subInX(x);
@@ -246,6 +246,7 @@ public class Polynomial {
 	 */
 	public Double findAZeroInBound(double lowerBound, double upperBound, int iterations){
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
+		//System.out.println("[" + lowerBound + "(" + func.output(lowerBound) + "), " + upperBound + "(" + func.output(upperBound) + "]");
 		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
 			this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0){ //this checks for that in the lower half of the bound
 			if(iterations <= 0){ //ends the recursion
@@ -260,7 +261,7 @@ public class Polynomial {
 			} else {
 				return findAZeroInBound(midPoint, upperBound, iterations-1);
 			}
-		} else if(midPointValue <= BASICALLY_ZERO){
+		} else if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0){
 			return midPoint;
 		} else {
 			//System.out.println("No zeroes found within bound [" + lowerBound + "," + upperBound + "]");
@@ -290,16 +291,16 @@ public class Polynomial {
 		}
 		//System.out.println("In: [" + lowerBound + "," + upperBound + "], subdiv: " + subDivisions);
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
-		if(midPointValue <= BASICALLY_ZERO && midPointValue >= 0){ //on the off chance that the zero is right on the midpoint
+		if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0){ //on the off chance that the zero is right on the midpoint
 			return new double[]{midPoint,midPoint};
 		}
-		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
-				this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0){
+		if((this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0) || //if one is positive and the other is negative, there is a zero in there somewhere
+				(this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0)){
 			//System.out.println("Bounds found: [" + lowerBound + "," + midPoint + "]");
 			return new double[]{lowerBound,midPoint};
 			
-		} else if(this.func.output(upperBound) < 0 && this.func.output(midPoint) > 0 ||
-				this.func.output(upperBound) > 0 && this.func.output(midPoint) < 0){ //indenting this second condition to look nice is hard. spaces > tabs fite me
+		} else if((this.func.output(upperBound) < 0 && this.func.output(midPoint) > 0) ||
+				(this.func.output(upperBound) > 0 && this.func.output(midPoint) < 0)){ //indenting this second condition to look nice is hard. spaces > tabs fite me
 			//System.out.println("Bounds found: [" + midPoint + "," + upperBound + "]");
 			return new double[]{midPoint,upperBound};
 			
@@ -355,7 +356,7 @@ public class Polynomial {
 					zeros.add(zero);
 				}
 			}
-			lowerBound = bounds[1] + BASICALLY_ZERO;
+			lowerBound = zero + BASICALLY_ZERO;
 		}
 		return zeros;
 	}
@@ -403,6 +404,20 @@ public class Polynomial {
 			}
 		}
 		return new Polynomial(this.getName() + "_Derivative",newTerms);
+	}
+	
+	public ArrayList<Double> findExtrema(double lowerBound, double upperBound){
+		Polynomial derivative = this.getDerivativePolynomial();
+		System.out.println(derivative);
+		ArrayList<Double> extrema = derivative.findAllZeroesInBound(lowerBound, upperBound);
+		extrema.add(lowerBound);
+		extrema.add(upperBound); //you count edge cases too
+		Collections.sort(extrema, (d1,d2) -> compareOutputs((double)d1,(double)d2)); //so absolute mins and maxes are easy to find
+		return extrema;
+	}
+	
+	public int compareOutputs(double x1, double x2){ //orders from least to greatest in output
+		return (int)Math.signum( Math.abs(this.func.output(x2)) - Math.abs(this.func.output(x1)) );
 	}
 	
 	@Override

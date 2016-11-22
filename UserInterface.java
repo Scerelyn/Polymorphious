@@ -60,7 +60,7 @@ public class UserInterface {
 	public Polynomial createPolynomial(String input){
 		Polynomial poly = null; 
 		String[] splitInput = input.trim().split(" ");
-		System.out.println(splitInput.length);
+		//System.out.println(splitInput.length);
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new IndexOutOfBoundsException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
 		}
@@ -146,7 +146,12 @@ public class UserInterface {
 		}
 	}
 	
-	
+	/**
+	 * Find and prints the zeros within the given bounds of the given polynomial
+	 * 
+	 * @param input
+	 *            The string input telling the polymonial and bounds to use
+	 */
 	public void printZero(String input){
 		String[] splitInput = input.split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
@@ -219,6 +224,13 @@ public class UserInterface {
 		}
 	}
 	
+	/**
+	 * Finds and prints the derivative of the given polynomial at the given
+	 * point
+	 * 
+	 * @param input
+	 *            The string input telling the polynomial and x value to use
+	 */
 	public void printDerivative(String input){
 		String[] splitInput = input.split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
@@ -246,5 +258,49 @@ public class UserInterface {
 				System.out.println("No default polynomial found");
 			}
 		}
+	}
+	
+	public void printExtrema(String input){ //after a few times you can really see that most of these methods is verification, with minimal changes
+		String[] splitInput = input.split(" ");
+		if(splitInput.length != 3 && splitInput.length != 2){
+			throw new IndexOutOfBoundsException("Invalid input string. Format should be: extrema <name> [LowerBound,UpperBound] or extrema [LowerBound,UpperBound]");
+		}
+		Polynomial poly = null;
+		String boundString = "";
+		if(splitInput.length == 3){
+			poly = getPolynomialByName(splitInput[1],false);
+			boundString = splitInput[2];
+		} else {
+			poly = getPolynomialByName("",false);
+			boundString = splitInput[1];
+		}
+		double[] bounds = verifyBounds(boundString);
+		if(bounds == null){ //invalid bounds
+			return;
+		}
+		try{
+			ArrayList<Double> extrema = poly.findExtrema(bounds[LOWER_BOUND_INDEX],bounds[UPPER_BOUND_INDEX]);
+			System.out.println("Extrema found: " + extrema.size());
+			System.out.println("Absolute minimum at x = " + df3.format(extrema.get(0)) + " with value of " + df3.format( poly.getFunc().output(extrema.get(0))) );
+			System.out.println("Absolute maximum at x = " + df3.format( extrema.get(extrema.size()-1) ) + " with value of " + df3.format(  poly.getFunc().output( extrema.get(extrema.size()-1) ))  );
+			System.out.println("Other extrema: ");
+			for(Double extremaLoc : extrema){
+				double concavity = poly.getDerivativePolynomial().differentiate((double)extremaLoc); //getting nth derivatives is easy, just spam getDerivativePolynomial()
+				if(concavity == 0){ //using concavity test for determining if its a min or a max value. only one number needed for this test
+					System.out.println("Inflection point at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
+				} else if(concavity < 0){
+					System.out.println("Maximum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
+				} else {
+					System.out.println("Minimum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
+				}
+			}
+		} catch(NullPointerException e){
+			if(splitInput.length == 3){
+				System.out.println("No polynomial by the name of: " + splitInput[1]);
+			} else {
+				System.out.println("No default polynomial found");
+			}
+		}
+		
 	}
 }

@@ -37,14 +37,9 @@ _Zeroes - Finds the x values of any zeros in the bound given
 	intercepts <function name> [lowerbound,upperbound]
 ex: zero QuadraticOne [0,10]
 
-_Minimum and Maximum Values - Gives the minimum values and/or maximum values ofthe function within the bound given
-	min <function name> [lowerbound, upperbound]
-	minimum <function name> [lowerbound,upperbound]
-	max <function name> [lowerbound,upperbound]
-	maximum <function name> [lowerbound,upperbound]
+_Minimum and Maximum Values - Gives the minimum values and maximum values ofthe function within the bound given
 	extrema <function name> [lowerbound,upperbound]
-ex: min QuadraticOne [-1,7]
-max QuadraticOne [9,10]
+ex: extrema QuadraticOne [-1,7]
 
 _Concavity - Find the concavity at a certain value of x
 	concavity <function name> <x value>
