@@ -285,7 +285,7 @@ public class UserInterface {
 			System.out.println("Absolute maximum at x = " + df3.format( extrema.get(extrema.size()-1) ) + " with value of " + df3.format(  poly.getFunc().output( extrema.get(extrema.size()-1) ))  );
 			System.out.println("Other extrema: ");
 			for(Double extremaLoc : extrema){
-				double concavity = poly.getDerivativePolynomial().differentiate((double)extremaLoc); //getting nth derivatives is easy, just spam getDerivativePolynomial()
+				double concavity = poly.getDerivativePolynomial().differentiate(extremaLoc.doubleValue()); //getting nth derivatives is easy, just spam getDerivativePolynomial()
 				if(concavity == 0){ //using concavity test for determining if its a min or a max value. only one number needed for this test
 					System.out.println("Inflection point at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
 				} else if(concavity < 0){

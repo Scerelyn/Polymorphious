@@ -13,7 +13,7 @@ public class Polynomial {
 	private final Function func;
 	private final String name; //these dont change
 	public final double BASICALLY_ZERO = 0.001; //how accurate a number should be to be considered "enough" or equal to zero
-	
+	public final int BOUND_SPLIT_AMOUNT = 1000;
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);
@@ -270,115 +270,16 @@ public class Polynomial {
 	}
 
 	/**
-	 * Deprecated, no longer needed
-	 * Breaks down the given bound to search for zeros, and recurses to further
-	 * break down the bound, as the above with give false negatives if the
-	 * bounds are too big and a zero is within it. This is a substep method for
-	 * findAZero()
+	 * Finds all zeroes within the given bound
 	 * 
 	 * @param lowerBound
-	 *            The lower bound to search in
+	 *            The lower bound to search from
 	 * @param upperBound
-	 *            The upper bound to search in
-	 * @param subDivisions
-	 *            How many times to divide, in half, the given bound
-	 * @return A double array containing the bounds where a zero can be found
-	 *         using findAZeroInBound() without a false negative. Returns null
-	 *         if no bounds with zeroes within them are given. Lower is index 0, upper is index 1
-	 */
-	@Deprecated
-	public double[] findABoundWithAZero(double lowerBound, double upperBound, int subDivisions){ //recursion is a mess to track, here is really bad
-		if(subDivisions < 0){ //no negatives
-			throw new IndexOutOfBoundsException("Negative Iteration count: " + subDivisions);
-		}
-		//System.out.println("In: [" + lowerBound + "," + upperBound + "], subdiv: " + subDivisions);
-		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
-		if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0){ //on the off chance that the zero is right on the midpoint
-			return new double[]{midPoint,midPoint};
-		}
-		if((this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0) || //if one is positive and the other is negative, there is a zero in there somewhere
-				(this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0)){
-			//System.out.println("Bounds found: [" + lowerBound + "," + midPoint + "]");
-			return new double[]{lowerBound,midPoint};
-			
-		} else if((this.func.output(upperBound) < 0 && this.func.output(midPoint) > 0) ||
-				(this.func.output(upperBound) > 0 && this.func.output(midPoint) < 0)){ //indenting this second condition to look nice is hard. spaces > tabs fite me
-			//System.out.println("Bounds found: [" + midPoint + "," + upperBound + "]");
-			return new double[]{midPoint,upperBound};
-			
-		} else { //if the initial given bounds had none, then split it up
-			if(subDivisions > 0){
-				//System.out.println("Else: [" + lowerBound + "," + midPoint + "], subdiv: " + subDivisions); 
-				double[] lowerSearch = findABoundWithAZero(lowerBound, midPoint, subDivisions - 1); //check lower
-				if(lowerSearch == null){ //if nothing in lower, then check upper
-					return findABoundWithAZero(midPoint, upperBound, subDivisions - 1); //checks upper and returns it, this'll recurse
-				}
-				else {
-					return lowerSearch; //lower search gave something
-				}
-			}
-			return null; //if subDivisions is <= 0 then no bounds with zeroes exist, so null
-		}
-	}
-	
-	/**
-	 * Deprecated, this only finds the leftmost zero, whereas
-	 * findAllZerosInBound finds all of them. Combines findAZeroInBound() and
-	 * findABoundWithAZero() into one method, because readability and ease
-	 * 
-	 * @return The x value where a zero was found
-	 */
-	@Deprecated
-	public Double findAZero(double lowerBound, double upperBound){
-		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
-		double[] bounds = findABoundWithAZero(lowerBound,upperBound,iterationCount);
-		if(bounds == null){
-			System.out.println("No zeroes found in bounds: [" + lowerBound + "," + upperBound + "]");
-			return null;
-		}
-		return findAZeroInBound(bounds[0],bounds[1],iterationCount);
-	}
-	
-	/**
-	 * Depreciated, algorithm was very poor esp with multiple zeroes in the same bound
-	 * Finds all zeros within the given bound
-	 * @param lowerBound The lower bound to search from
-	 * @param upperBound The upper bound to search until
-	 * @return An arraylist containing double objects
-	 */
-	@Deprecated
-	public ArrayList<Double> findAllZeroesInBoundOld(double lowerBound, double upperBound){
-		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
-		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
-		Double zero = new Double(0.0); //using more nulls for checks
-		double[] bounds = {};
-		while(lowerBound <= upperBound && zero != null && bounds != null){ //one of these will happen and end the while loop
-			bounds = findABoundWithAZero(lowerBound,upperBound,iterationCount);
-			try{
-				zero = findAZeroInBound(bounds[0],bounds[1],iterationCount);
-			} catch(NullPointerException e){
-				//bounds is null, this ends the method
-				return zeros;
-			}
-			if(zero != null){ //zero isnt null
-				if(zeros.size() == 0 
-						|| (zeros.size() > 0 && !( Math.abs(zeros.get(zeros.size()-1)) - Math.abs(zero) <= BASICALLY_ZERO ))){ //no duplicates
-					zeros.add(zero);
-				}
-			}
-			lowerBound = zero + BASICALLY_ZERO;
-		}
-		return zeros;
-	}
-	
-	/**
-	 * Finds all zeroes within the given bound
-	 * @param lowerBound The lower bound to search from
-	 * @param upperBound The upper bound to search until
+	 *            The upper bound to search until
 	 * @return An array list containing Double objects
 	 */
 	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
-		double iterStep = Math.abs(upperBound - lowerBound) / 1000;
+		double iterStep = Math.abs(upperBound - lowerBound) / BOUND_SPLIT_AMOUNT;
 		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
 		Double zero = new Double(0.0); //using more nulls for checks
@@ -451,12 +352,14 @@ public class Polynomial {
 		ArrayList<Double> extrema = derivative.findAllZeroesInBound(lowerBound, upperBound);
 		extrema.add(lowerBound);
 		extrema.add(upperBound); //you count edge cases too
+		System.out.println(extrema);
 		Collections.sort(extrema, (d1,d2) -> compareOutputs((double)d1,(double)d2)); //so absolute mins and maxes are easy to find
+		System.out.println(extrema);
 		return extrema;
 	}
 	
 	public int compareOutputs(double x1, double x2){ //orders from least to greatest in output
-		return (int)Math.signum( Math.abs(this.func.output(x2)) - Math.abs(this.func.output(x1)) );
+		return (int)Math.signum( Math.abs(this.func.output(x2) - this.func.output(x1)) );
 	}
 	
 	@Override
