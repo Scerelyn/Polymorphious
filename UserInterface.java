@@ -126,7 +126,11 @@ public class UserInterface {
 			}
 		}
 		if(!suppressPrint){
-			System.out.println("No polynomial was found named: " + name);
+			if(!name.isEmpty()){
+				System.out.println("No polynomial was found named: " + name);
+			} else {
+				System.out.println("No default polynomial found");
+			}
 		}
 		return null;
 	}
@@ -147,32 +151,19 @@ public class UserInterface {
 			throw new InvalidFormatException("Invalid input string. Format should be: output <name> <x value> or output <x value>");
 		}
 		Double xVal = null; //using nulls for checks in validity. null = invalid number/input
+		Polynomial poly = null; //null and uninstantiated are for some odd reason different. you'd think uninstantiated would be null on default
 		if(splitInput.length == 3){
 			xVal = verifyDouble(splitInput[2]);
+			poly = getPolynomialByName(splitInput[1],false);
 		}
 		else {
 			xVal = verifyDouble(splitInput[1]);
+			poly = getPolynomialByName("",false);
 		}
-		Polynomial poly = null; //null and uninstantiated are for some odd reason different. you'd think uninstantiated would be null on default
-		if(xVal == null){
+		if(xVal == null || poly == null){
 			return; //if the number fails to verify, end the method here
 		}
-		try{
-			if(splitInput.length >= 3){
-				poly = getPolynomialByName(splitInput[1],false);
-			} else { //implied to be length of 2, or the exception is thrown beforehand
-				poly = getPolynomialByName("",false);
-			}
-			System.out.println( "The value of " + poly.toString() + " at x = " + xVal + " is "
-					+ df3.format( poly.getFunc().output(xVal) ) );
-		} catch(NullPointerException e){
-			if(splitInput.length == 3){
-				System.out.println("No such polynomial by the name of: " + splitInput[1]);
-			} else { 
-				System.out.println("No default polynomial found");
-			}
-			return;
-		}
+		System.out.println( "The value of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.getFunc().output(xVal) ) );
 	}
 	
 	/**
@@ -199,24 +190,16 @@ public class UserInterface {
 			boundString = splitInput[1];
 		}
 		double[] bounds = verifyBounds(boundString);
-		if(bounds == null){ //invalid bounds
+		if(bounds == null || poly == null){ //invalid bounds
 			return;
 		}
-		try{
-			ArrayList<Double> zeros = poly.findAllZeroesInBound(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
-			if (!zeros.isEmpty()) {
-				System.out.print("Found zeros in bounds " + boundString + " at x values of: ");
-				for (Double d : zeros) {
-					System.out.print(df2.format(d) + ", ");
-				}
-				System.out.println();
+		ArrayList<Double> zeros = poly.findAllZeroesInBound(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
+		if (!zeros.isEmpty()) {
+			System.out.print("Found zeros in bounds " + boundString + " at x values of: ");
+			for (Double d : zeros) {
+				System.out.print(df2.format(d) + ", ");
 			}
-		} catch(NullPointerException e){
-			if(splitInput.length == 3){
-				System.out.println("No polynomial by the name of: " + splitInput[1]);
-			} else {
-				System.out.println("No default polynomial found");
-			}
+			System.out.println();
 		}
 	}
 	
@@ -244,19 +227,11 @@ public class UserInterface {
 			boundString = splitInput[1];
 		}
 		double[] bounds = verifyBounds(boundString);
-		if(bounds == null){ //invalid bounds
+		if(bounds == null || poly == null){ //invalid bounds
 			return;
 		}
-		try{
-			double area = poly.simpsons(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX],200);
-			System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + df3.format(area));
-		} catch(NullPointerException e){
-			if(splitInput.length == 3){
-				System.out.println("No polynomial by the name of: " + splitInput[1]);
-			} else {
-				System.out.println("No default polynomial found");
-			}
-		}
+		double area = poly.simpsons(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX],200);
+		System.out.println("The integral of " + poly + " over bounds " + boundString + " is " + df3.format(area));		
 	}
 	
 	/**
@@ -284,20 +259,20 @@ public class UserInterface {
 			xVal = verifyDouble(splitInput[1]);
 			poly = getPolynomialByName("",false);
 		}
-		if(xVal == null){
-			return; //if the number fails to verify, end the method here
+		if(xVal == null || poly == null){
+			return; //if the number or polynomial fail to verify, end the method here
 		}
-		try{
-			System.out.println("The numerical derivative of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.differentiate(xVal) ));
-		} catch(NullPointerException e){
-			if(splitInput.length == 3){
-				System.out.println("No polynomial by the name of: " + splitInput[1]);
-			} else {
-				System.out.println("No default polynomial found");
-			}
-		}
+		System.out.println("The numerical derivative of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.differentiate(xVal) ));
 	}
 	
+	/**
+	 * Finds and prints extrema of the function within a given bound
+	 * 
+	 * @param input
+	 *            The input string to parse from
+	 * @throws InvalidFormatException
+	 *             If the string input is invalid
+	 */
 	public void printExtrema(String input) throws InvalidFormatException{ //after a few times you can really see that most of these methods is verification, with minimal changes
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
@@ -313,35 +288,35 @@ public class UserInterface {
 			boundString = splitInput[1];
 		}
 		double[] bounds = verifyBounds(boundString);
-		if(bounds == null){ //invalid bounds
+		if(bounds == null || poly == null){ //invalid bounds
 			return;
 		}
-		try{
-			ArrayList<Double> extrema = poly.findExtrema(bounds[LOWER_BOUND_INDEX],bounds[UPPER_BOUND_INDEX]);
-			System.out.println("Extrema found: " + extrema.size());
-			System.out.println("Absolute minimum at x = " + df3.format(extrema.get(0)) + " with value of " + df3.format( poly.getFunc().output(extrema.get(0))) );
-			System.out.println("Absolute maximum at x = " + df3.format( extrema.get(extrema.size()-1) ) + " with value of " + df3.format(  poly.getFunc().output( extrema.get(extrema.size()-1) ))  );
-			System.out.println("Other extrema: ");
-			for(Double extremaLoc : extrema){
-				double concavity = poly.getDerivativePolynomial().differentiate(extremaLoc.doubleValue()); //getting nth derivatives is easy, just spam getDerivativePolynomial()
-				if(concavity == 0){ //using concavity test for determining if its a min or a max value. only one number needed for this test
-					System.out.println("Inflection point at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
-				} else if(concavity < 0){
-					System.out.println("Maximum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
-				} else {
-					System.out.println("Minimum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
-				}
-			}
-		} catch(NullPointerException e){
-			if(splitInput.length == 3){
-				System.out.println("No polynomial by the name of: " + splitInput[1]);
+		ArrayList<Double> extrema = poly.findExtrema(bounds[LOWER_BOUND_INDEX],bounds[UPPER_BOUND_INDEX]);
+		System.out.println("Extrema found: " + extrema.size());
+		System.out.println("Absolute minimum at x = " + df3.format(extrema.get(0)) + " with value of " + df3.format( poly.getFunc().output(extrema.get(0))) );
+		System.out.println("Absolute maximum at x = " + df3.format( extrema.get(extrema.size()-1) ) + " with value of " + df3.format(  poly.getFunc().output( extrema.get(extrema.size()-1) ))  );
+		System.out.println("Other extrema: ");
+		for(Double extremaLoc : extrema){
+			double concavity = poly.getDerivativePolynomial().differentiate(extremaLoc.doubleValue()); //getting nth derivatives is easy, just spam getDerivativePolynomial()
+			if(concavity == 0){ //using concavity test for determining if its a min or a max value. only one number needed for this test
+				System.out.println("Inflection point at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
+			} else if(concavity < 0){
+				System.out.println("Maximum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
 			} else {
-				System.out.println("No default polynomial found");
+				System.out.println("Minimum value at x = " + df3.format( extremaLoc ) + " of value " + df3.format( poly.getFunc().output(extremaLoc)) );
 			}
 		}
-		
 	}
-	
+
+	/**
+	 * Plots the polynomial over given bounds
+	 * 
+	 * @param input
+	 *            A string input to parse from, in format: plot <polynomial>
+	 *            [xLower,xUpper] [yLower,yUpper]
+	 * @throws InvalidFormatException
+	 *             If the input string is invalid
+	 */
 	public void printPolyOnBounds(String input) throws InvalidFormatException{
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 4){
@@ -397,5 +372,84 @@ public class UserInterface {
 		planeView += "|"; //and the last peice of the box
 		System.out.println("Printing " + poly.toString() + " over bounds x:" + xBoundString + " y:" + yBoundString);
 		System.out.println(planeView);
+	}
+	
+	public void printConcavity(String input) throws InvalidFormatException {
+		String[] splitInput = input.trim().split(" ");
+		if(splitInput.length != 3 && splitInput.length != 2){
+			throw new InvalidFormatException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
+		}
+		Polynomial poly = null;
+		Double xVal = null; 
+		if(splitInput.length == 3){
+			xVal = verifyDouble(splitInput[2]);
+			poly = getPolynomialByName(splitInput[1],false);
+		}
+		else {
+			xVal = verifyDouble(splitInput[1]);
+			poly = getPolynomialByName("",false);
+		}
+		if(xVal == null || poly == null){
+			return; 
+		}
+		System.out.println("The concavity of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.getDerivativePolynomial().differentiate(xVal) ));
+
+	}
+	
+	/**
+	 * Receives and interprets a user input string
+	 * 
+	 * @param input
+	 *            The string inputed from the user
+	 */
+	public void interpret(String input){
+		String[] splitInput = input.split(" ");
+		try {
+			switch (splitInput[0].toLowerCase()) {
+				case "new":
+					this.createPolynomial(input);
+					break;
+				case "output":
+					this.printOutput(input);
+			 		break;
+				case "diff":
+				case "differentiate":
+				case "derivative":
+				case "d/dx":
+				case "slope":
+					this.printDerivative(input);
+					break;
+				case "area":
+				case "inte":
+				case "integrate":
+					this.printIntegral(input);
+					break;
+				case "zero":
+				case "zeroes":
+				case "intercepts":
+				case "root":
+				case "roots":
+					this.printZero(input);
+					break;
+				case "extrema":
+					this.printExtrema(input);
+					break;
+				case "concavity":
+				case "conc":
+					this.printConcavity(input);
+					break;
+				case "plot":
+				case "graph":
+					this.printPolyOnBounds(input);
+					break;
+				case "combine":
+
+					break;
+				default:
+					System.out.println("Invalid command starter: " + splitInput[0]);
+			}
+		} catch (InvalidFormatException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }

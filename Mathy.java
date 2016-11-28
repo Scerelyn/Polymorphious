@@ -7,7 +7,7 @@ public class Mathy {
 		UserInterface UI = new UserInterface();
 		try{
 			UI.createPolynomial("create Joey x^4+8x^3+22x^2+24x+8");
-			UI.createPolynomial("create x^2");
+			//UI.createPolynomial("create x^2");
 			//UI.printOutput("output Joey 1");
 			//UI.printZero("zero Joey [-3,3]");
 			//UI.printIntegral("integrate Joey [0,5]");
