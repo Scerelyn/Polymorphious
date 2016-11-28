@@ -1,5 +1,7 @@
 package edu.neumont.csc110.EquationParsing;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -445,11 +447,40 @@ public class UserInterface {
 				case "combine":
 
 					break;
+				case "help":
+				case "?":
+					this.readHelp();
+					break;
 				default:
 					System.out.println("Invalid command starter: " + splitInput[0]);
 			}
-		} catch (InvalidFormatException e) {
+		} catch (InvalidFormatException | FileNotFoundException e) {
 			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void programLoop(){ //look how small this method is
+		Scanner in = new Scanner(System.in);
+		boolean keepGoing = true;
+		do{
+			System.out.println("What do you wish to do? Type help or ? for command listing");
+			String input = in.nextLine();
+			if(in.equals("qq")){
+				System.out.println("Exiting program...");
+			} else {
+				this.interpret(input);
+			}
+		} while(keepGoing);
+		in.close();
+		System.out.println("Thank you for using Polymorphious");
+	}
+	
+	public void readHelp() throws FileNotFoundException {
+		System.out.println("Printing userhelp.txt\n");
+		File userhelp = new File("src\\edu\\neumont\\csc110\\EquationParsing\\userhelp.txt");
+		Scanner txtScan = new Scanner(userhelp);
+		while(txtScan.hasNextLine()){
+			System.out.println(txtScan.nextLine());
 		}
 	}
 }
