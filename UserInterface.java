@@ -46,10 +46,10 @@ public class UserInterface {
 			lowerBound = Double.parseDouble( input.substring(1, input.indexOf(",")) );
 			upperBound = Double.parseDouble( input.substring(input.indexOf(",")+1, input.length()-1) );
 			return new double[]{lowerBound,upperBound};
-		} catch(NumberFormatException e){
+		} catch(NumberFormatException | StringIndexOutOfBoundsException e){
 			System.out.println("Invalid bounds: " + input);
 			return null;
-		}
+		} 
 	}
 	
 	/**
@@ -202,6 +202,8 @@ public class UserInterface {
 				System.out.print(df2.format(d) + ", ");
 			}
 			System.out.println();
+		} else {
+			System.out.println("Found no zeroes in the given bound");
 		}
 	}
 	
@@ -376,6 +378,14 @@ public class UserInterface {
 		System.out.println(planeView);
 	}
 	
+	/**
+	 * Prints the concavity at the given value of x
+	 * 
+	 * @param input
+	 *            The string to parse
+	 * @throws InvalidFormatException
+	 *             Thrown if the input is invalid
+	 */
 	public void printConcavity(String input) throws InvalidFormatException {
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
@@ -395,7 +405,48 @@ public class UserInterface {
 			return; 
 		}
 		System.out.println("The concavity of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.getDerivativePolynomial().differentiate(xVal) ));
-
+	}
+	
+	public void combinePolynomials(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
+		if(splitInput.length != 3 && splitInput.length != 4){
+			throw new InvalidFormatException("Invalid input string. Format should be: combine <polynomial 1> <polynomial 2> <optional: polynomial 3>");
+		}
+		Polynomial poly1 = getPolynomialByName(splitInput[1],false);
+		Polynomial poly2 = getPolynomialByName(splitInput[2],false);
+		Polynomial sum = null;
+		if(poly1 == null || poly2 == null){
+			return;
+		}
+		ArrayList<Term> sumTermList = new ArrayList<Term>();
+		sumTermList.addAll(poly1.getTermList());
+		sumTermList.addAll(poly2.getTermList());
+		if(splitInput.length == 3){
+			sum = new Polynomial("", sumTermList);
+			allPolys.remove(getPolynomialByName("",true));
+		} else {
+			sum = new Polynomial(splitInput[3], sumTermList);
+			allPolys.remove(getPolynomialByName(splitInput[3],true));
+		}
+		sum.sortIntoStandardOrder();
+		allPolys.add(sum);
+	}
+	
+	public void showPoly(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
+		if(splitInput.length != 1 && splitInput.length != 2){
+			throw new InvalidFormatException("Invalid input string. Format should be: combine <polynomial 1> <polynomial 2> <optional: polynomial 3>");
+		}
+		Polynomial poly = null;
+		if(splitInput.length == 1){
+			poly = getPolynomialByName("",false);
+		} else {
+			poly = getPolynomialByName(splitInput[1],false);
+		}
+		if(poly == null){
+			return;
+		}
+		System.out.println(poly);
 	}
 	
 	/**
@@ -405,7 +456,7 @@ public class UserInterface {
 	 *            The string inputed from the user
 	 */
 	public void interpret(String input){
-		String[] splitInput = input.split(" ");
+		String[] splitInput = input.trim().split(" ");
 		try {
 			switch (splitInput[0].toLowerCase()) {
 				case "new":
@@ -445,7 +496,10 @@ public class UserInterface {
 					this.printPolyOnBounds(input);
 					break;
 				case "combine":
-
+					this.combinePolynomials(input);
+					break;
+				case "show":
+					this.showPoly(input);
 					break;
 				case "help":
 				case "?":
@@ -458,7 +512,10 @@ public class UserInterface {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
+	/**
+	 * The main loop for the program
+	 */
 	public void programLoop(){ //look how small this method is
 		Scanner in = new Scanner(System.in);
 		boolean keepGoing = true;
@@ -474,7 +531,13 @@ public class UserInterface {
 		in.close();
 		System.out.println("Thank you for using Polymorphious");
 	}
-	
+
+	/**
+	 * Reads the userhelp.txt file
+	 * 
+	 * @throws FileNotFoundException
+	 *             Thrown if the file is not found
+	 */
 	public void readHelp() throws FileNotFoundException {
 		System.out.println("Printing userhelp.txt\n");
 		File userhelp = new File("src\\edu\\neumont\\csc110\\EquationParsing\\userhelp.txt");
@@ -482,5 +545,6 @@ public class UserInterface {
 		while(txtScan.hasNextLine()){
 			System.out.println(txtScan.nextLine());
 		}
+		txtScan.close();
 	}
 }

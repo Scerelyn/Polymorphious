@@ -56,3 +56,11 @@ _Plot - Plots the polynomial over given x and y bounds
 	plot <optional:function name> [x minimum, x maximum] [y minimum, y maximum]
 	graph <optional:function name> [x minimum, x maximum] [y minimum, y maximum]
 ex: plot QuadraticOne [0,5] [-5,5]
+
+_Showing a polynomial - Shows the polynomial in its polynomial form
+	show <optional:function name>
+ex: show QuadraticOne
+
+_Quitting the program
+	qq
+ex: qq
