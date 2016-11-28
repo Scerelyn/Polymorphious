@@ -5,7 +5,7 @@ import java.util.*;
 
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
-	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
+	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1,PLOTTING_DISTANCE_TOLERANCE = 1;
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
 	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	public static final DecimalFormat df2 = new DecimalFormat("0.##"); //for zeros, since for some reason they are quite inaccurate
@@ -15,7 +15,8 @@ public class UserInterface {
 	 * 
 	 * @param input
 	 *            The String to parse as the Double
-	 * @return A Double. Returns null if the number is invalid
+	 * @return A Double of value shown by the input string. Returns null if the
+	 *         number is invalid
 	 */
 	public Double verifyDouble(String input){
 		try{
@@ -50,19 +51,44 @@ public class UserInterface {
 	}
 	
 	/**
+	 * Verifies and returns a pair of validated integers for a bound from an
+	 * input string given
+	 * 
+	 * @param input
+	 *            The string to parse as a bound to use. Input as :[integer,
+	 *            integer], ex: [1,2]
+	 * @return An integer array of both validated integers. Returns null if
+	 *         either is invalid.
+	 */
+	public int[] verifyBoundsInt(String input){
+		try{
+			int lowerBound = 0;
+			int upperBound = 0;
+			lowerBound = Integer.parseInt( input.substring(1, input.indexOf(",")) );
+			upperBound = Integer.parseInt( input.substring(input.indexOf(",")+1, input.length()-1) );
+			return new int[]{lowerBound,upperBound};
+		} catch(NumberFormatException e){
+			System.out.println("Invalid bounds: " + input);
+			return null;
+		}
+	}
+	/**
 	 * Receives an create input string, assuming it is a valid create input, and
 	 * makes a polynomial from it
 	 * 
 	 * @param input
 	 *            The user input string. Consult Userhelp.txt for input formats
 	 * @return A built polynomial if input is valid
+	 * @throws InvalidFormatException
+	 *             If the input string is invalid, meaning too many or too
+	 *             little information that is needed
 	 */
-	public Polynomial createPolynomial(String input){
+	public Polynomial createPolynomial(String input) throws InvalidFormatException{
 		Polynomial poly = null; 
 		String[] splitInput = input.trim().split(" ");
 		//System.out.println(splitInput.length);
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
+			throw new InvalidFormatException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
 		}
 		if(splitInput.length == 2){
 			poly = new Polynomial("",splitInput[1]);
@@ -111,11 +137,14 @@ public class UserInterface {
 	 * 
 	 * @param input
 	 *            The input string
+	 * @throws InvalidFormatException 
+	 *             If the input string is invalid, meaning too many or too
+	 *             little information that is needed
 	 */
-	public void printOutput(String input){
+	public void printOutput(String input) throws InvalidFormatException{
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: output <name> <x value> or output <x value>");
+			throw new InvalidFormatException("Invalid input string. Format should be: output <name> <x value> or output <x value>");
 		}
 		Double xVal = null; //using nulls for checks in validity. null = invalid number/input
 		if(splitInput.length == 3){
@@ -151,11 +180,14 @@ public class UserInterface {
 	 * 
 	 * @param input
 	 *            The string input telling the polymonial and bounds to use
+	 * @throws InvalidFormatException 
+	 *             If the input string is invalid, meaning too many or too
+	 *             little information that is needed
 	 */
-	public void printZero(String input){
-		String[] splitInput = input.split(" ");
+	public void printZero(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: zero <name> [LowerBound,UpperBound] or zero [LowerBound,UpperBound]");
+			throw new InvalidFormatException("Invalid input string. Format should be: zero <name> [LowerBound,UpperBound] or zero [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		String boundString = "";
@@ -193,11 +225,14 @@ public class UserInterface {
 	 * 
 	 * @param input
 	 *            The input string to parse and use
+	 * @throws InvalidFormatException 
+	 *             If the input string is invalid, meaning too many or too
+	 *             little information that is needed
 	 */
-	public void printIntegral(String input){
-		String[] splitInput = input.split(" ");
+	public void printIntegral(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
+			throw new InvalidFormatException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		String boundString = "";
@@ -230,11 +265,14 @@ public class UserInterface {
 	 * 
 	 * @param input
 	 *            The string input telling the polynomial and x value to use
+	 * @throws InvalidFormatException 
+	 *             If the input string is invalid, meaning too many or too
+	 *             little information that is needed
 	 */
-	public void printDerivative(String input){
-		String[] splitInput = input.split(" ");
+	public void printDerivative(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
+			throw new InvalidFormatException("Invalid input string. Format should be: integrate <name> [LowerBound,UpperBound] or integrate [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		Double xVal = null; //using nulls for checks in validity. null = invalid number/input
@@ -260,10 +298,10 @@ public class UserInterface {
 		}
 	}
 	
-	public void printExtrema(String input){ //after a few times you can really see that most of these methods is verification, with minimal changes
-		String[] splitInput = input.split(" ");
+	public void printExtrema(String input) throws InvalidFormatException{ //after a few times you can really see that most of these methods is verification, with minimal changes
+		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 2){
-			throw new IndexOutOfBoundsException("Invalid input string. Format should be: extrema <name> [LowerBound,UpperBound] or extrema [LowerBound,UpperBound]");
+			throw new InvalidFormatException("Invalid input string. Format should be: extrema <name> [LowerBound,UpperBound] or extrema [LowerBound,UpperBound]");
 		}
 		Polynomial poly = null;
 		String boundString = "";
@@ -302,5 +340,62 @@ public class UserInterface {
 			}
 		}
 		
+	}
+	
+	public void printPolyOnBounds(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
+		if(splitInput.length != 3 && splitInput.length != 4){
+			throw new InvalidFormatException("Invalid input string. Format should be: plot <name> [xLower,xUpper] [yLower,yUpper] or plot [xLower,xUpper] [yLower,yUpper]. Integer bounds only");
+		}
+		String xBoundString = "", yBoundString = "";
+		Polynomial poly = null; //still have no idea why default isnt null
+		if(splitInput.length == 3){
+			xBoundString = splitInput[1];
+			yBoundString = splitInput[2];
+			poly = getPolynomialByName("",false);
+		} else { //length == 4
+			xBoundString = splitInput[2];
+			yBoundString = splitInput[3];
+			poly = getPolynomialByName(splitInput[1],false);
+		}
+		int[] xBounds = verifyBoundsInt(xBoundString); //ints because setting steps for plotting is a difficult pain to deal with
+		int[] yBounds = verifyBoundsInt(yBoundString);
+		if(xBounds == null || yBounds == null || poly == null){
+			return; //cant do much with nulls
+		}
+		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]);
+		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]);
+		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
+		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
+			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){
+				try{
+					int output = (int)Math.round(poly.getFunc().output(x)); //will be a bit off
+					if(Math.abs(output - y) <= PLOTTING_DISTANCE_TOLERANCE){
+						plane[ y - yBounds[LOWER_BOUND_INDEX] ][ x - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
+					}
+				} catch (IndexOutOfBoundsException e){
+					//means the output at the given x is out of bounds and not on the graph
+				}
+			}
+		}
+		String planeView = "\t";
+		for(int i = 0; i < xLength+2; i++){
+			planeView += "_";
+		} //just adding the upper part of the view box
+		planeView += "\n";
+		for(int y = plane.length-1; y >= 0; y--){ //x and y are array aligned; y is inverted hence the backwards forloop
+			planeView += ( y + yBounds[LOWER_BOUND_INDEX] ) + "\t|";
+			for(int x = 0; x < plane[y].length; x++){
+				planeView += plane[y][x] ? "x" : "."; //if true (point present) add on x, no point here add on a . 
+			}
+			planeView += "|\n"; //end of this y row
+		}
+		planeView += " \t|"; //now we get the bottom part of the box
+		for(int i = 0; i < xLength; i++){
+			planeView += "_";
+		} //just adding the upper part of the view box
+		planeView += "|"; //and the last peice of the box
+		System.out.println("Printing " + poly.toString() + " over bounds x:" + xBoundString + " y:" + yBoundString);
+		System.out.println(planeView);
 	}
 }
