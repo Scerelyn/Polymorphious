@@ -196,6 +196,9 @@ public class UserInterface {
 			return;
 		}
 		ArrayList<Double> zeros = poly.findAllZeroesInBound(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
+		if(zeros == null){
+			return;
+		}
 		if (!zeros.isEmpty()) {
 			System.out.print("Found zeros in bounds " + boundString + " at x values of: ");
 			for (Double d : zeros) {
@@ -296,6 +299,9 @@ public class UserInterface {
 			return;
 		}
 		ArrayList<Double> extrema = poly.findExtrema(bounds[LOWER_BOUND_INDEX],bounds[UPPER_BOUND_INDEX]);
+		if(extrema == null){
+			return;
+		}
 		System.out.println("Extrema found: " + extrema.size());
 		System.out.println("Absolute minimum at x = " + df3.format(extrema.get(0)) + " with value of " + df3.format( poly.getFunc().output(extrema.get(0))) );
 		System.out.println("Absolute maximum at x = " + df3.format( extrema.get(extrema.size()-1) ) + " with value of " + df3.format(  poly.getFunc().output( extrema.get(extrema.size()-1) ))  );

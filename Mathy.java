@@ -1,7 +1,5 @@
 package edu.neumont.csc110.EquationParsing;
 
-import java.io.FileNotFoundException;
-
 public class Mathy {
 	
 	//this class is solely to run the program

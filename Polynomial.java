@@ -12,7 +12,7 @@ public class Polynomial {
 	ArrayList<Term> termList = new ArrayList<Term>();
 	private final Function func;
 	private final String name; //these dont change
-	public final double BASICALLY_ZERO = 0.001; //how accurate a number should be to be considered "enough" or equal to zero
+	public final double BASICALLY_ZERO = 1.0E-25; //how accurate a number should be to be considered "enough" or equal to zero
 	public final int BOUND_SPLIT_AMOUNT = 1000;
 	public Polynomial(String name, String str){
 		this.name = name;
@@ -197,12 +197,19 @@ public class Polynomial {
 	 * @return The approximation of the definite integral over the given bound
 	 */
 	public double simpsons(double lowerBound, double upperBound, int subIntervals){ //up to 3 decimal accuracy, for 200 subintervals
+		int direction = 1;
+		if(upperBound < lowerBound){
+			direction = -1;
+			double temp = lowerBound;
+			lowerBound = upperBound;
+			upperBound = temp;
+		}
 		double boundSize = (upperBound - lowerBound) / subIntervals; //smaller bound size -> more accuracy, or at least until double can't store more accuracy
 		double sum = 0;
 		for(double l = lowerBound; l < upperBound; l += boundSize){
 			sum += simpsonSubStep(l, l+boundSize);
 		}
-		return sum;
+		return direction*sum;
 	}
 
 	/**
@@ -246,22 +253,25 @@ public class Polynomial {
 	 */
 	public Double findAZeroInBound(double lowerBound, double upperBound, int iterations){
 		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
-		//System.out.println("[" + lowerBound + "(" + func.output(lowerBound) + "), " + upperBound + "(" + func.output(upperBound) + "]");
-		if(this.func.output(lowerBound) < 0 && this.func.output(midPoint) > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
-			this.func.output(lowerBound) > 0 && this.func.output(midPoint) < 0){ //this checks for that in the lower half of the bound
+		double lowerOut = this.func.output(lowerBound),upperOut = this.func.output(upperBound);
+		System.out.println("[" + lowerBound + "(" + func.output(lowerBound) + "), " + upperBound + "(" + func.output(upperBound) + "]");
+		if(lowerOut < 0 && midPointValue > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
+				lowerOut > 0 && midPointValue < 0){ //this checks for that in the lower half of the bound
 			if(iterations <= 0){ //ends the recursion
 				return midPoint;
 			} else {
 				return findAZeroInBound(lowerBound, midPoint, iterations-1); //recursive, so further split the bounds
 			}
-		} else if(this.func.output(upperBound) < 0 && this.func.output(midPoint) > 0 ||
-				this.func.output(upperBound) > 0 && this.func.output(midPoint) < 0){ //now for the upper half
+		} else if(upperOut < 0 && midPointValue > 0 ||
+				upperOut > 0 && midPointValue < 0){ //now for the upper half
 			if(iterations <= 0){
 				return midPoint;
 			} else {
 				return findAZeroInBound(midPoint, upperBound, iterations-1);
 			}
-		} else if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0){
+		} else if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0 ||
+				(Math.abs( lowerOut ) <= BASICALLY_ZERO && Math.abs( lowerOut ) >= 0) ||
+				(Math.abs( upperOut ) <= BASICALLY_ZERO && Math.abs( upperOut ) >= 0) ){
 			return midPoint;
 		} else {
 			//System.out.println("No zeroes found within bound [" + lowerBound + "," + upperBound + "]");
@@ -279,6 +289,10 @@ public class Polynomial {
 	 * @return An array list containing Double objects
 	 */
 	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
+		if(upperBound < lowerBound){
+			System.out.println("Invalid bounds, order should be reversed");
+			return null;
+		}
 		double iterStep = Math.abs(upperBound - lowerBound) / BOUND_SPLIT_AMOUNT;
 		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
@@ -297,6 +311,12 @@ public class Polynomial {
 			}
 			
 		}
+//		System.out.println(zeros);
+//		ArrayList<Double> zerosOut = new ArrayList<Double>();
+//		for(double d : zeros){
+//			zerosOut.add(this.func.output(d));
+//		}
+//		System.out.println(zerosOut);
 		return zeros;
 	}
 	
@@ -346,6 +366,10 @@ public class Polynomial {
 	}
 	
 	public ArrayList<Double> findExtrema(double lowerBound, double upperBound){
+		if(upperBound < lowerBound){
+			System.out.println("Invalid bounds, order should be reversed");
+			return null;
+		}
 		Polynomial derivative = this.getDerivativePolynomial();
 		//System.out.println(derivative);
 		ArrayList<Double> extrema = derivative.findAllZeroesInBound(lowerBound, upperBound);
