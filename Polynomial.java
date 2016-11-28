@@ -285,11 +285,10 @@ public class Polynomial {
 		Double zero = new Double(0.0); //using more nulls for checks
 		double[] bounds = {};
 		while(lowerBound <= upperBound){ //one of these will happen and end the while loop
-			bounds = new double[]{lowerBound,lowerBound + iterStep};
-			zero = findAZeroInBound(bounds[0],bounds[1],iterationCount);
+			zero = findAZeroInBound(lowerBound, lowerBound + iterStep, iterationCount);
 			if(zero != null){ //zero isnt null
 				if(zeros.size() == 0 
-						|| (zeros.size() > 0 && !( Math.abs(zeros.get(zeros.size()-1)) - Math.abs(zero) <= BASICALLY_ZERO ))){ //no duplicates
+						|| (zeros.size() > 0 && !( Math.abs( zeros.get(zeros.size()-1) - zero ) <= BASICALLY_ZERO ))){ //no duplicates
 					zeros.add(zero);
 					lowerBound = zero + BASICALLY_ZERO;
 				}
@@ -348,18 +347,18 @@ public class Polynomial {
 	
 	public ArrayList<Double> findExtrema(double lowerBound, double upperBound){
 		Polynomial derivative = this.getDerivativePolynomial();
-		System.out.println(derivative);
+		//System.out.println(derivative);
 		ArrayList<Double> extrema = derivative.findAllZeroesInBound(lowerBound, upperBound);
 		extrema.add(lowerBound);
 		extrema.add(upperBound); //you count edge cases too
-		System.out.println(extrema);
+		//System.out.println(extrema);
 		Collections.sort(extrema, (d1,d2) -> compareOutputs((double)d1,(double)d2)); //so absolute mins and maxes are easy to find
-		System.out.println(extrema);
+		//System.out.println(extrema);
 		return extrema;
 	}
 	
 	public int compareOutputs(double x1, double x2){ //orders from least to greatest in output
-		return (int)Math.signum( Math.abs(this.func.output(x2) - this.func.output(x1)) );
+		return (int)Math.signum( this.func.output(x2) - this.func.output(x1) );
 	}
 	
 	@Override
