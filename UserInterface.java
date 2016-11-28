@@ -7,7 +7,8 @@ import java.util.*;
 
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
-	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1,PLOTTING_DISTANCE_TOLERANCE = 1;
+	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
+	public static final double PLOTTING_DISTANCE_TOLERANCE = 0.1;
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
 	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	public static final DecimalFormat df2 = new DecimalFormat("0.##"); //for zeros, since for some reason they are quite inaccurate
@@ -348,13 +349,17 @@ public class UserInterface {
 		if(xBounds == null || yBounds == null || poly == null){
 			return; //cant do much with nulls
 		}
+		if(xBounds[UPPER_BOUND_INDEX] < xBounds[LOWER_BOUND_INDEX] || yBounds[UPPER_BOUND_INDEX] < yBounds[LOWER_BOUND_INDEX]){
+			System.out.println("Invalid bounds, they should be reversed");
+			return;
+		}
 		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]);
 		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]);
 		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
 		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
 			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){
 				try{
-					int output = (int)Math.round(poly.getFunc().output(x)); //will be a bit off
+					double output = poly.getFunc().output(x); //will be a bit off
 					if(Math.abs(output - y) <= PLOTTING_DISTANCE_TOLERANCE){
 						plane[ y - yBounds[LOWER_BOUND_INDEX] ][ x - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
 					}
@@ -413,6 +418,15 @@ public class UserInterface {
 		System.out.println("The concavity of " + poly.toString() + " at x = " + xVal + " is " + df3.format( poly.getDerivativePolynomial().differentiate(xVal) ));
 	}
 	
+	/**
+	 * Combines polynomials and add them to the list, and replaces of the same
+	 * name exists
+	 * 
+	 * @param input
+	 *            The input string
+	 * @throws InvalidFormatException
+	 *             Thrown if the input is invalid
+	 */
 	public void combinePolynomials(String input) throws InvalidFormatException{
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 3 && splitInput.length != 4){
@@ -438,6 +452,14 @@ public class UserInterface {
 		allPolys.add(sum);
 	}
 	
+	/**
+	 * Prints the polynomial
+	 * 
+	 * @param input
+	 *            The string input to parse
+	 * @throws InvalidFormatException
+	 *             Thrown if the input is invalid
+	 */
 	public void showPoly(String input) throws InvalidFormatException{
 		String[] splitInput = input.trim().split(" ");
 		if(splitInput.length != 1 && splitInput.length != 2){
