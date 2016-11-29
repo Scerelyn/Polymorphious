@@ -354,8 +354,8 @@ public class UserInterface {
 			System.out.println("Invalid bounds, they should be reversed");
 			return;
 		}
-		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]);
-		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]);
+		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]) + 1; //plus one since the outer bound spot wouldnt be counted otherwise
+		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]) + 1;
 		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
 		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
 			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){

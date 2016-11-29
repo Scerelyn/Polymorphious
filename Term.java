@@ -8,9 +8,12 @@ public class Term{
 	public Term(double constant, double exponent){
 		termData = new double[]{constant,exponent};
 	}
+	
 	/**
 	 * Gives the value of the expression if the given x is substituted in
-	 * @param x The value to substitute x for
+	 * 
+	 * @param x
+	 *            The value to substitute x for
 	 * @return The value of the expression with x substituted
 	 */
 	public double subInX(double x){ 
