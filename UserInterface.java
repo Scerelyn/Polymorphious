@@ -196,7 +196,7 @@ public class UserInterface {
 		if(bounds == null || poly == null){ //invalid bounds
 			return;
 		}
-		ArrayList<Double> zeros = poly.findAllZeroesInBound(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
+		ArrayList<Double> zeros = poly.findAllZeroesInBoundNewtons(bounds[LOWER_BOUND_INDEX], bounds[UPPER_BOUND_INDEX]);
 		if(zeros == null){
 			return;
 		}
