@@ -11,7 +11,6 @@ public class UserInterface {
 	public static final double PLOTTING_DISTANCE_TOLERANCE = 0.1;
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
 	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
-	public static final DecimalFormat df2 = new DecimalFormat("0.##"); //for zeros, since for some reason they are quite inaccurate
 	
 	/**
 	 * Verifies and returns a Double from an input String
@@ -203,7 +202,7 @@ public class UserInterface {
 		if (!zeros.isEmpty()) {
 			System.out.print("Found zeros in bounds " + boundString + " at x values of: ");
 			for (Double d : zeros) {
-				System.out.print(df2.format(d) + ", ");
+				System.out.print(df3.format(d) + ", ");
 			}
 			System.out.println();
 		} else {

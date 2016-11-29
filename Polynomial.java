@@ -8,7 +8,7 @@ public class Polynomial {
 		public double output(double x);
 	}
 	private final Function func;
-	ArrayList<Term> termList = new ArrayList<Term>();
+	private ArrayList<Term> termList = new ArrayList<Term>();
 	private final String name; //these dont change
 	public final double BASICALLY_ZERO = 1.0E-10; //how accurate a number should be to be considered "enough" or equal to zero
 	public final int BOUND_SPLIT_AMOUNT = 1000;
@@ -226,107 +226,25 @@ public class Polynomial {
 				(4*func.output( ((upperBound+lowerBound)/2) )) + 
 				func.output(upperBound) );
 	}
+
 	/**
 	 * Finds the slope of the polynomial at a given value of x
-	 * @param x The value to find the slope on
+	 * 
+	 * @param x
+	 *            The value to find the slope on
 	 * @return The slope at that point
 	 */
 	public double differentiate(double x){ //accurate up to six decimal places
 		return this.getDerivativePolynomial().getFunc().output(x);
 	} //its basically the slope formula on a very small line
-
-	/**
-	 * Deprecated, bisection is terrible. Use newton's method instead
-	 * Finds a zero within the given bounds using the Bisection algorithm. 
-	 * Note: this defers to the root closest to zero if there are multiple 
-	 * roots within the bound, and only has 3 decimal place accuracy. 
-	 * This is a substep method for findAZero()
-	 * 
-	 * @param lowerBound
-	 *            The lower bound to search in for a zero/root
-	 * @param upperBound
-	 *            The upper bound to search in for a zero/root
-	 * @param iterations
-	 *            The number of iterations to go through. More iterations gives
-	 *            more accuracy
-	 * @return The x value of where the zero/root is located at
-	 */
-	@Deprecated
-	public Double findAZeroInBound(double lowerBound, double upperBound, int iterations){
-		double midPoint = (lowerBound + upperBound) / 2,  midPointValue = this.func.output(midPoint);
-		double lowerOut = this.func.output(lowerBound),upperOut = this.func.output(upperBound);
-		System.out.println("[" + lowerBound + "(" + func.output(lowerBound) + "), " + upperBound + "(" + func.output(upperBound) + "]");
-		if(lowerOut < 0 && midPointValue > 0 || //if one is positive and the other is negative, there is a zero in there somewhere
-				lowerOut > 0 && midPointValue < 0){ //this checks for that in the lower half of the bound
-			if(iterations <= 0){ //ends the recursion
-				return midPoint;
-			} else {
-				return findAZeroInBound(lowerBound, midPoint, iterations-1); //recursive, so further split the bounds
-			}
-		} else if(upperOut < 0 && midPointValue > 0 ||
-				upperOut > 0 && midPointValue < 0){ //now for the upper half
-			if(iterations <= 0){
-				return midPoint;
-			} else {
-				return findAZeroInBound(midPoint, upperBound, iterations-1);
-			}
-		} else if(Math.abs(midPointValue) <= BASICALLY_ZERO && Math.abs(midPointValue) >= 0 ||
-				(Math.abs( lowerOut ) <= BASICALLY_ZERO && Math.abs( lowerOut ) >= 0) ||
-				(Math.abs( upperOut ) <= BASICALLY_ZERO && Math.abs( upperOut ) >= 0) ){
-			return midPoint;
-		} else {
-			//System.out.println("No zeroes found within bound [" + lowerBound + "," + upperBound + "]");
-			return null; //this is why i used Double and not double, because i need this extraneous value to use for checks
-		}
-	}
-
-	/**
-	 * Deprecated, use the Newton's method equivalent, findAllZeroesInBoundNewtons()
-	 * Finds all zeroes within the given bound
-	 * 
-	 * @param lowerBound
-	 *            The lower bound to search from
-	 * @param upperBound
-	 *            The upper bound to search until
-	 * @return An array list containing Double objects
-	 */
-	@Deprecated
-	public ArrayList<Double> findAllZeroesInBound(double lowerBound, double upperBound){
-		if(upperBound < lowerBound){
-			System.out.println("Invalid bounds, order should be reversed");
-			return null;
-		}
-		double iterStep = Math.abs(upperBound - lowerBound) / BOUND_SPLIT_AMOUNT;
-		int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
-		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
-		Double zero = new Double(0.0); //using more nulls for checks
-		double[] bounds = {};
-		while(lowerBound <= upperBound){ //one of these will happen and end the while loop
-			zero = findAZeroInBound(lowerBound, lowerBound + iterStep, iterationCount);
-			if(zero != null){ //zero isnt null
-				if(zeros.size() == 0 
-						|| (zeros.size() > 0 && !( Math.abs( zeros.get(zeros.size()-1) - zero ) <= BASICALLY_ZERO ))){ //no duplicates
-					zeros.add(zero);
-					lowerBound = zero + BASICALLY_ZERO;
-				}
-			} else {
-				lowerBound += iterStep;
-			}
-			
-		}
-//		System.out.println(zeros);
-//		ArrayList<Double> zerosOut = new ArrayList<Double>();
-//		for(double d : zeros){
-//			zerosOut.add(this.func.output(d));
-//		}
-//		System.out.println(zerosOut);
-		return zeros;
-	}
 	
 	/**
 	 * Finds all the zeros in the given bound, using Newton's method
-	 * @param lowerBound The lowerbound to check
-	 * @param upperBound The upperbound to check
+	 * 
+	 * @param lowerBound
+	 *            The lowerbound to check
+	 * @param upperBound
+	 *            The upperbound to check
 	 * @return An arraylist of Doubles containing the zeros found
 	 */
 	public ArrayList<Double> findAllZeroesInBoundNewtons(double lowerBound, double upperBound){
@@ -357,11 +275,14 @@ public class Polynomial {
 		}
 		return zeros;
 	}
-	
+
 	/**
 	 * The first "step" of Newton's method, this iterates the algorithm
-	 * @param start The initial guess, or starting point
-	 * @param iterations How many iterations to go for
+	 * 
+	 * @param start
+	 *            The initial guess, or starting point
+	 * @param iterations
+	 *            How many iterations to go for
 	 * @return The approximate zero value
 	 */
 	public Double findZeroNewtonsFirst(double start, int iterations){
@@ -374,7 +295,9 @@ public class Polynomial {
 	
 	/**
 	 * The substep method for newton's method
-	 * @param guess The guess to based this step off of
+	 * 
+	 * @param guess
+	 *            The guess to based this step off of
 	 * @return The next approximation that Newton's method yields
 	 */
 	public double findZeroNewtonsSubstep(double guess){
@@ -383,32 +306,6 @@ public class Polynomial {
 			return this.func.output(guess);
 		}
 		return guess - ( (this.func.output(guess)) / (derivative.func.output(guess)) ); // x0 - ( f(x0) / f'(x0) )
-	}
-	
-	/**
-	 * Finds an optimal amount of iterations that would give a good result for
-	 * zero finding, depending on bound length since a simple constant would
-	 * kill accuracy on large bounds.
-	 * 
-	 * @param lowerBound
-	 *            The lower bound to use
-	 * @param upperBound
-	 *            The upper bound to use
-	 * @return The suitable iteration count to use with the given bounds
-	 */
-	@Deprecated
-	public int findOptimalIterationCount(double lowerBound, double upperBound){
-		double boundLength = Math.abs(upperBound) - Math.abs(lowerBound);
-		if(boundLength < 1){
-			boundLength *= 10;
-		}
-		int boundLengthNoDecimals = (int)boundLength;
-		int iterationCount = 10; //at least ten iterations, the findAZeroInBound() will end prematurely if a zero is found, so too many isnt an issue
-		while(boundLengthNoDecimals > 10){
-			boundLengthNoDecimals %= 10;
-			iterationCount += 20; //iterations per digit
-		}
-		return iterationCount;
 	}
 	
 	/**
