@@ -20,7 +20,7 @@ public class UserInterface {
 	 * @return A Double of value shown by the input string. Returns null if the
 	 *         number is invalid
 	 */
-	public Double verifyDouble(String input){
+	public Double verifyDouble(String input){ //CSC101 Requirement 12: User input validation
 		try{
 			return Double.parseDouble(input);
 		} catch(NumberFormatException e){
@@ -69,11 +69,12 @@ public class UserInterface {
 			lowerBound = Integer.parseInt( input.substring(1, input.indexOf(",")) );
 			upperBound = Integer.parseInt( input.substring(input.indexOf(",")+1, input.length()-1) );
 			return new int[]{lowerBound,upperBound};
-		} catch(NumberFormatException e){
+		} catch(NumberFormatException | StringIndexOutOfBoundsException e){
 			System.out.println("Invalid bounds: " + input);
 			return null;
 		}
 	}
+	
 	/**
 	 * Receives an create input string, assuming it is a valid create input, and
 	 * makes a polynomial from it
@@ -89,6 +90,7 @@ public class UserInterface {
 		Polynomial poly = null; 
 		String[] splitInput = input.trim().split(" ");
 		//System.out.println(splitInput.length);
+		//CSC101 Requirement 3: Branching a) if b) else if
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new InvalidFormatException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
 		}
@@ -485,7 +487,7 @@ public class UserInterface {
 	public void interpret(String input){
 		String[] splitInput = input.trim().split(" ");
 		try {
-			switch (splitInput[0].toLowerCase()) {
+			switch (splitInput[0].toLowerCase()) { //CSC101 Requirement 9: Switch statement
 				case "new":
 					this.createPolynomial(input);
 					break;
@@ -547,10 +549,12 @@ public class UserInterface {
 		Scanner in = new Scanner(System.in);
 		boolean keepGoing = true;
 		do{
+			//CSC101 Requirement 1: Console I/O
 			System.out.println("What do you wish to do? Type help or ? for command listing");
 			String input = in.nextLine();
-			if(in.equals("qq")){
+			if(input.equals("qq")){
 				System.out.println("Exiting program...");
+				keepGoing = false;
 			} else {
 				this.interpret(input);
 			}

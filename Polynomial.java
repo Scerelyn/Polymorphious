@@ -8,7 +8,10 @@ public class Polynomial {
 		public double output(double x);
 	}
 	private final Function func;
+	//CSC101 Requirement 5: Array/Collection
 	private ArrayList<Term> termList = new ArrayList<Term>();
+	//CSC101 Requirement 2: Primitive Types
+	//CSC101 Requirement 8: Constants
 	private final String name; //these dont change
 	public final double BASICALLY_ZERO = 1.0E-10; //how accurate a number should be to be considered "enough" or equal to zero
 	public final int BOUND_SPLIT_AMOUNT = 1000;
@@ -37,7 +40,7 @@ public class Polynomial {
 		};
 		this.termList = terms;
 	}
-
+	//CSC101 Requirement 11: Javadoc comment syntax annotation
 	/**
 	 * Removes all spaces inside a given string. Made for user friendliness
 	 * 
@@ -45,7 +48,7 @@ public class Polynomial {
 	 *            The string to clear spaces
 	 * @return The original string without spaces in it
 	 */
-	private String wipeSpacesOut(String toBeWiped){
+	private String wipeSpacesOut(String toBeWiped){ //CSC101 Requirement 6: Methods/Functions
 		String[] splitUp = toBeWiped.split(" "); //all elements wont have a space in it
 		String cleared = "";
 		for(String part : splitUp){
@@ -205,6 +208,7 @@ public class Polynomial {
 		}
 		double boundSize = (upperBound - lowerBound) / subIntervals; //smaller bound size -> more accuracy, or at least until double can't store more accuracy
 		double sum = 0;
+		//CSC101 Requirement 4: Iteration: a) For loop
 		for(double l = lowerBound; l < upperBound; l += boundSize){
 			sum += simpsonSubStep(l, l+boundSize);
 		}
@@ -257,6 +261,7 @@ public class Polynomial {
 		//int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
 		double zero = 0;
+		//CSC101 Requirement 4: b) While loop
 		while(lowerBound <= upperBound){ //one of these will happen and end the while loop
 			zero = this.findZeroNewtonsFirst(lowerBound, NEWTONS_METHOD_ITERATIONS);
 			//System.out.println(zero + " " + this.func.output(zero));
@@ -356,6 +361,7 @@ public class Polynomial {
 		}
 		return expression.substring(3); //expression will have an extra plus sign and spaces in the front
 	}
+	//CSC101 Requirement 7: Custom class with encapsulation
 	public ArrayList<Term> getTermList() {
 		return termList;
 	}
