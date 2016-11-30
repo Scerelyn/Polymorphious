@@ -377,7 +377,13 @@ public class UserInterface {
 		for(int y = plane.length-1; y >= 0; y--){ //x and y are array aligned; y is inverted hence the backwards forloop
 			planeView += ( y + yBounds[LOWER_BOUND_INDEX] ) + "\t|";
 			for(int x = 0; x < plane[y].length; x++){
-				planeView += plane[y][x] ? "x" : "."; //if true (point present) add on x, no point here add on a . 
+				if(x + xBounds[LOWER_BOUND_INDEX] != 0 && y + yBounds[LOWER_BOUND_INDEX] != 0){
+					planeView += plane[y][x] ? "x" : "."; //if true (point present) add on x, no point here add on a . 
+				} else if (x + xBounds[LOWER_BOUND_INDEX] == 0 && y + yBounds[LOWER_BOUND_INDEX] != 0){ //on the y axis
+					planeView += plane[y][x] ? "x" : "|";
+				} else { //x axis
+					planeView += plane[y][x] ? "x" : "-";
+				}
 			}
 			planeView += "|\n"; //end of this y row
 		}
@@ -548,6 +554,7 @@ public class UserInterface {
 	public void programLoop(){ //look how small this method is
 		Scanner in = new Scanner(System.in);
 		boolean keepGoing = true;
+		System.out.println("Welcome to Polymorpious");
 		do{
 			//CSC101 Requirement 1: Console I/O
 			System.out.println("What do you wish to do? Type help or ? for command listing");
