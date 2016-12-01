@@ -7,6 +7,6 @@ public class InvalidFormatException extends Exception{
 	private static final long serialVersionUID = -8945333206036015386L;
 	
 	public InvalidFormatException(String message){
-		super(message);
+		super(message); 
 	}
 }
