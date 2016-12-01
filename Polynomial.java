@@ -227,9 +227,9 @@ public class Polynomial {
 	 *            The value to find the slope on
 	 * @return The slope at that point
 	 */
-	public double differentiate(double x){ //accurate up to six decimal places
+	public double differentiate(double x){ //exact because power rule :^)
 		return this.getDerivativePolynomial().getFunc().output(x);
-	} //its basically the slope formula on a very small line
+	}
 	
 	/**
 	 * Finds all the zeros in the given bound, using Newton's method
