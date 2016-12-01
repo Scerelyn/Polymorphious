@@ -15,7 +15,7 @@ public class Polynomial {
 	private final String name; //these dont change
 	public final double BASICALLY_ZERO = 1.0E-10; //how accurate a number should be to be considered "enough" or equal to zero
 	public final int BOUND_SPLIT_AMOUNT = 1000;
-	public final int NEWTONS_METHOD_ITERATIONS = 10;
+	public final int NEWTONS_METHOD_ITERATIONS = 10; //ten can get a p good amount of accuracy
 	public Polynomial(String name, String str){
 		this.name = name;
 		str = wipeSpacesOut(str);

@@ -33,7 +33,7 @@ public class Term{
 				(termData[EXPONENT_INDEX] == 0 ? "" : "x") +//if exponent is zero, give no x
 				( (termData[EXPONENT_INDEX] == 1 || termData[EXPONENT_INDEX] == 0)  ? "" : "^" + termData[EXPONENT_INDEX]); //if one or zero, dont give exponent
 	} //that mess is so constants and exponents of ones are omitted, and x's with exponents of zero are omitted
-	//tried teriaries for the first time and man i cant read this very well at all, but it works :V
+	//tried tertiaries for the first time and man i cant read this very well at all, but it works :V
 	public double[] getTermData() {
 		return termData;
 	}

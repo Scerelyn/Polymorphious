@@ -8,7 +8,7 @@ import java.util.*;
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
 	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
-	public static final double PLOTTING_DISTANCE_TOLERANCE = 0.1;
+	public static final double PLOTTING_STEP_SIZE = 1E-1; //doesnt do much for continuity though :c
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
 	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	
@@ -357,16 +357,31 @@ public class UserInterface {
 		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]) + 1; //plus one since the outer bound spot wouldnt be counted otherwise
 		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]) + 1;
 		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
-		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
-			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){
-				try{
-					double output = poly.getFunc().output(x); //will be a bit off
-					if(Math.abs(output - y) <= PLOTTING_DISTANCE_TOLERANCE){
-						plane[ y - yBounds[LOWER_BOUND_INDEX] ][ x - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
-					}
-				} catch (IndexOutOfBoundsException e){
-					//means the output at the given x is out of bounds and not on the graph
+//		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
+//			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){
+//				try{
+//					double output = poly.getFunc().output(x); //will be a bit off
+//					System.out.println("(" + (x - xBounds[LOWER_BOUND_INDEX]) + "," + (y- yBounds[LOWER_BOUND_INDEX]) + ")" + output);
+//					if(Math.abs(output - y) <= PLOTTING_DISTANCE_TOLERANCE){
+//						plane[ y - yBounds[LOWER_BOUND_INDEX] ][ x - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
+//					}
+//				} catch (IndexOutOfBoundsException e){
+//					//means the output at the given x is out of bounds and not on the graph
+//				}
+//			}
+//		}
+		for(double x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX] + PLOTTING_STEP_SIZE; x+= PLOTTING_STEP_SIZE){ //the + 0.1 on the conditional is to make sure the last corner point is plotted
+			try{
+				double output = poly.getFunc().output(x); //will be a bit off
+				//System.out.println("(" + (x - xBounds[LOWER_BOUND_INDEX]) + "," + (y- yBounds[LOWER_BOUND_INDEX]) + ")" + output);
+				if(x < 0){
+					plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
 				}
+				else {
+					plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
+				}
+			} catch (IndexOutOfBoundsException e){
+				//means the output at the given x is out of bounds and not on the graph
 			}
 		}
 		String planeView = "\t";
@@ -554,7 +569,7 @@ public class UserInterface {
 	public void programLoop(){ //look how small this method is
 		Scanner in = new Scanner(System.in);
 		boolean keepGoing = true;
-		System.out.println("Welcome to Polymorpious");
+		System.out.println("Welcome to Polymorphious");
 		do{
 			//CSC101 Requirement 1: Console I/O
 			System.out.println("What do you wish to do? Type help or ? for command listing");
