@@ -153,17 +153,6 @@ public class Polynomial {
 		}
 		return true;
 	}
-
-	/**
-	 * Outputs the value of the polynomial at a given value of x
-	 * 
-	 * @param x
-	 *            The input value
-	 * @return The value of the polynomial at x
-	 */
-	public double giveOutput(double x){
-		return func.output(x);
-	}
 	
 	/**
 	 * Compares the exponents between terms
