@@ -89,7 +89,6 @@ public class UserInterface {
 	public Polynomial createPolynomial(String input) throws InvalidFormatException{
 		Polynomial poly = null; 
 		String[] splitInput = input.trim().split(" ");
-		//System.out.println(splitInput.length);
 		//CSC101 Requirement 3: Branching a) if b) else if
 		if(splitInput.length != 3 && splitInput.length != 2){ //going to be strict here
 			throw new InvalidFormatException("Invalid input string. Format should be: create <name> <polynomial entry> or create <polynomial entry>");
@@ -357,23 +356,9 @@ public class UserInterface {
 		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]) + 1; //plus one since the outer bound spot wouldnt be counted otherwise
 		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]) + 1;
 		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
-//		for(int y = yBounds[UPPER_BOUND_INDEX]; y >= yBounds[LOWER_BOUND_INDEX]; y--){ //view plane aligned
-//			for(int x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX]; x++){
-//				try{
-//					double output = poly.getFunc().output(x); //will be a bit off
-//					System.out.println("(" + (x - xBounds[LOWER_BOUND_INDEX]) + "," + (y- yBounds[LOWER_BOUND_INDEX]) + ")" + output);
-//					if(Math.abs(output - y) <= PLOTTING_DISTANCE_TOLERANCE){
-//						plane[ y - yBounds[LOWER_BOUND_INDEX] ][ x - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
-//					}
-//				} catch (IndexOutOfBoundsException e){
-//					//means the output at the given x is out of bounds and not on the graph
-//				}
-//			}
-//		}
 		for(double x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX] + PLOTTING_STEP_SIZE; x+= PLOTTING_STEP_SIZE){ //the + 0.1 on the conditional is to make sure the last corner point is plotted
 			try{
 				double output = poly.getFunc().output(x); //will be a bit off
-				//System.out.println("(" + (x - xBounds[LOWER_BOUND_INDEX]) + "," + (y- yBounds[LOWER_BOUND_INDEX]) + ")" + output);
 				if(x < 0){
 					plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
 				}

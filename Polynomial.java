@@ -258,13 +258,11 @@ public class Polynomial {
 		}
 		int maxPossibleRoots = (int)Math.ceil(this.getTermList().get(0).getTermData()[Term.EXPONENT_INDEX]); //highest exponents tells maximum roots that can exist
 		double iterStep = (upperBound - lowerBound) / (maxPossibleRoots*2); //*2 to double the amount of subintervals
-		//int iterationCount = findOptimalIterationCount(lowerBound,upperBound);
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
 		double zero = 0;
 		//CSC101 Requirement 4: b) While loop
 		while(lowerBound <= upperBound){ //one of these will happen and end the while loop
 			zero = this.findZeroNewtonsFirst(lowerBound, NEWTONS_METHOD_ITERATIONS);
-			//System.out.println(zero + " " + this.func.output(zero));
 			if(Math.abs(this.func.output(zero)) <= BASICALLY_ZERO && Math.abs(this.func.output(zero)) >= 0){ //checking to see if the result is close enough to zero
 				if(zeros.size() == 0 
 						|| (zeros.size() > 0 && !( Math.abs( zeros.get(zeros.size()-1) - zero ) <= BASICALLY_ZERO ))){ //no duplicates
@@ -339,13 +337,10 @@ public class Polynomial {
 			return null;
 		}
 		Polynomial derivative = this.getDerivativePolynomial();
-		//System.out.println(derivative);
 		ArrayList<Double> extrema = derivative.findAllZeroesInBoundNewtons(lowerBound, upperBound);
 		extrema.add(lowerBound);
 		extrema.add(upperBound); //you count edge cases too
-		//System.out.println(extrema);
 		Collections.sort(extrema, (d1,d2) -> compareOutputs((double)d1,(double)d2)); //so absolute mins and maxes are easy to find
-		//System.out.println(extrema);
 		return extrema;
 	}
 	
