@@ -1,4 +1,4 @@
-package edu.neumont.csc110.EquationParsing;
+package edu.neumont.csc110.finalproject.group24;
 
 public class Term{
 	private final double termData[];

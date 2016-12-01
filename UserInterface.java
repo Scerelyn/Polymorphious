@@ -1,4 +1,4 @@
-package edu.neumont.csc110.EquationParsing;
+package edu.neumont.csc110.finalproject.group24;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,7 +8,7 @@ import java.util.*;
 //handles parsing the inputs of the user and prints stuff into the console
 public class UserInterface {
 	public static final int LOWER_BOUND_INDEX = 0, UPPER_BOUND_INDEX = 1;
-	public static final double PLOTTING_STEP_SIZE = 1E-1; //doesnt do much for continuity though :c
+	public static final double PLOTTING_STEP_SIZE = 1E-1;
 	private ArrayList<Polynomial> allPolys = new ArrayList<Polynomial>();
 	public static final DecimalFormat df3 = new DecimalFormat("0.###"); //most answers are only within 3 decimal place accuracy
 	
@@ -356,40 +356,38 @@ public class UserInterface {
 		int xLength = (int)(xBounds[UPPER_BOUND_INDEX] - xBounds[LOWER_BOUND_INDEX]) + 1; //plus one since the outer bound spot wouldnt be counted otherwise
 		int yLength = (int)(yBounds[UPPER_BOUND_INDEX] - yBounds[LOWER_BOUND_INDEX]) + 1;
 		boolean[][] plane = new boolean[yLength][xLength]; //boolean since values are either: a point here or a point isnt here
+		//writing to the plane array
 		for(double x = xBounds[LOWER_BOUND_INDEX]; x <= xBounds[UPPER_BOUND_INDEX] + PLOTTING_STEP_SIZE; x+= PLOTTING_STEP_SIZE){ //the + 0.1 on the conditional is to make sure the last corner point is plotted
 			try{
 				double output = poly.getFunc().output(x); //will be a bit off
-				if(x < 0){
-					plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
-				}
-				else {
-					plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
-				}
+				plane[ (int)Math.round(output) - yBounds[LOWER_BOUND_INDEX] ][ (int)Math.round(x) - xBounds[LOWER_BOUND_INDEX] ] = true; //converted from view bounds to array bounds
 			} catch (IndexOutOfBoundsException e){
 				//means the output at the given x is out of bounds and not on the graph
 			}
 		}
-		String planeView = "\t";
+		//now we draw the plane, by setting up a string first
+		String planeView = "Y\t";
 		for(int i = 0; i < xLength+2; i++){
-			planeView += "_";
+			planeView += "__";
 		} //just adding the upper part of the view box
+		planeView = planeView.substring(0,planeView.length()-2); //we have an extra _
 		planeView += "\n";
 		for(int y = plane.length-1; y >= 0; y--){ //x and y are array aligned; y is inverted hence the backwards forloop
 			planeView += ( y + yBounds[LOWER_BOUND_INDEX] ) + "\t|";
 			for(int x = 0; x < plane[y].length; x++){
 				if(x + xBounds[LOWER_BOUND_INDEX] != 0 && y + yBounds[LOWER_BOUND_INDEX] != 0){
-					planeView += plane[y][x] ? "x" : "."; //if true (point present) add on x, no point here add on a . 
+					planeView += plane[y][x] ? "x " : "  "; //if true (point present) add on x, no point here add on a space 
 				} else if (x + xBounds[LOWER_BOUND_INDEX] == 0 && y + yBounds[LOWER_BOUND_INDEX] != 0){ //on the y axis
-					planeView += plane[y][x] ? "x" : "|";
+					planeView += plane[y][x] ? "x " : "| ";
 				} else { //x axis
-					planeView += plane[y][x] ? "x" : "-";
+					planeView += plane[y][x] ? "x " : "- ";
 				}
 			}
 			planeView += "|\n"; //end of this y row
 		}
 		planeView += " \t|"; //now we get the bottom part of the box
 		for(int i = 0; i < xLength; i++){
-			planeView += "_";
+			planeView += "__";
 		} //just adding the upper part of the view box
 		planeView += "|"; //and the last peice of the box
 		System.out.println("Printing " + poly.toString() + " over bounds x:" + xBoundString + " y:" + yBoundString);

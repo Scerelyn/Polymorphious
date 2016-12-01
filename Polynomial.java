@@ -1,4 +1,4 @@
-package edu.neumont.csc110.EquationParsing;
+package edu.neumont.csc110.finalproject.group24;
 
 import java.util.*;
 //handles the data of and actions of polynomials
@@ -256,7 +256,7 @@ public class Polynomial {
 			System.out.println("Invalid bounds, order should be reversed");
 			return null;
 		}
-		int maxPossibleRoots = (int)Math.ceil(this.getTermList().get(0).getTermData()[Term.EXPONENT_INDEX]); //highest exponents tells maximum roots that can exist
+		int maxPossibleRoots = Math.abs( (int)Math.ceil(this.getTermList().get(0).getTermData()[Term.EXPONENT_INDEX]) ); //highest exponents tells maximum roots that can exist; negatives too if we take absolute value
 		double iterStep = (upperBound - lowerBound) / (maxPossibleRoots*2); //*2 to double the amount of subintervals
 		ArrayList<Double> zeros = new ArrayList<Double>(); //arraylist since we dont know how many, and fundamental theorem of algebra cannot confirm how many real zeroes exist
 		double zero = 0;
