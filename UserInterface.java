@@ -576,7 +576,7 @@ public class UserInterface {
 	 */
 	public void readHelp() throws FileNotFoundException {
 		System.out.println("Printing userhelp.txt\n");
-		File userhelp = new File("src\\edu\\neumont\\csc110\\EquationParsing\\userhelp.txt");
+		File userhelp = new File("src\\edu\\neumont\\csc110\\finalproject\\group24\\userhelp.txt");
 		Scanner txtScan = new Scanner(userhelp);
 		while(txtScan.hasNextLine()){
 			System.out.println(txtScan.nextLine());
