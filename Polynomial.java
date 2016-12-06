@@ -320,6 +320,16 @@ public class Polynomial {
 		return new Polynomial(this.getName() + "_Derivative",newTerms);
 	}
 	
+	/**
+	 * Finds extrema within a given bound
+	 * 
+	 * @param lowerBound
+	 *            The lower bound to search in
+	 * @param upperBound
+	 *            The upper bound to search until
+	 * @return An arraylist of doubles of x values of where extrema have been
+	 *         found
+	 */
 	public ArrayList<Double> findExtrema(double lowerBound, double upperBound){
 		if(upperBound < lowerBound){
 			System.out.println("Invalid bounds, order should be reversed");
@@ -333,8 +343,63 @@ public class Polynomial {
 		return extrema;
 	}
 	
+	/**
+	 * Compares values by their outputs on the polynomial
+	 * 
+	 * @param x1
+	 *            x value 1
+	 * @param x2
+	 *            x value 2
+	 * @return -1 if f(x1) < f(x2), 0 if f(x1) = f(x2), 1 if f(x1) > f(x2)
+	 */
 	public int compareOutputs(double x1, double x2){ //orders from least to greatest in output
 		return (int)Math.signum( this.func.output(x2) - this.func.output(x1) );
+	}
+
+	/**
+	 * Sythetically divides this polynomial by linear polynomial x-a
+	 * 
+	 * @param dividingNumber
+	 *            In form x-a, a is the value of dividingNumber. If the divisor
+	 *            is x+a, input -a as the parameter
+	 * @return The resulting polynomial divided by x-dividingNumber. The
+	 *         remainder term is ignored and not included in the resulting
+	 *         division
+	 */
+	public Polynomial syntheticDivision(double dividingNumber){
+		ArrayList<Term> newTerms = new ArrayList<Term>();
+		double[] coeffs = new double[(int)this.termList.get(0).getTermData()[Term.EXPONENT_INDEX]+1];
+		double[] newCoeffs = new double[coeffs.length];
+		for(Term t : this.termList){
+			if(t.getTermData()[Term.CONSTANT_INDEX] != (int)(t.getTermData()[Term.CONSTANT_INDEX])){
+				System.out.println("Decimal exponent present, cannot synthetically divide");
+				return null;
+			}
+		}
+		double maxExpo = this.termList.get(0).getTermData()[Term.EXPONENT_INDEX];
+		for(int i = 0; i < coeffs.length; i++){ //coefficients will be set in descending order depending on exponent
+			boolean exponentMatched = false;
+			for (int j = 0; j < this.getTermList().size(); j++) {
+				if(this.getTermList().get(j).getTermData()[Term.EXPONENT_INDEX] == maxExpo - i){
+					coeffs[i] = this.termList.get(j).getTermData()[Term.CONSTANT_INDEX];
+					exponentMatched = true;
+					j = this.getTermList().size();
+				}
+			}
+			if(!exponentMatched){
+				coeffs[i] = 0;
+			}
+			
+		}
+		newCoeffs[0] = coeffs[0];
+		for(int i = 1; i < coeffs.length; i++){
+			newCoeffs[i] = coeffs[i] + newCoeffs[i-1]*dividingNumber;
+		}
+		maxExpo--; //since the resulting poly is always one degree less than the dividend
+		for(int i = 0; i < newCoeffs.length-1; i++){
+			newTerms.add(new Term(newCoeffs[i], maxExpo--)); //index increases, but the exponent goes down. kinda annoying eh?
+		}
+		return new Polynomial(this.name + "_Synthetically Divded by x-" + dividingNumber, newTerms);
 	}
 	
 	@Override
