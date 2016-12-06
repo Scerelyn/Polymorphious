@@ -482,6 +482,27 @@ public class UserInterface {
 		System.out.println(poly);
 	}
 	
+	public void printSynth(String input) throws InvalidFormatException{
+		String[] splitInput = input.trim().split(" ");
+		if(splitInput.length != 3 && splitInput.length != 2){
+			throw new InvalidFormatException("Invalid input string. Format should be: combine <polynomial 1> <polynomial 2> <optional: polynomial 3>");
+		}
+		Polynomial poly = null;
+		Double divisor = null;
+		if(splitInput.length == 2){
+			poly = getPolynomialByName("",false);
+			divisor = verifyDouble(splitInput[1]);
+		} else {
+			poly = getPolynomialByName(splitInput[1],false);
+			divisor = verifyDouble(splitInput[2]);
+		}
+		if(poly == null || divisor == null){
+			return;
+		}
+		System.out.println("The synthetic division with divisor x" + (divisor > 0 ? "-" + divisor : "+" + (divisor*-1)) //tertiary to make sure if divisor < 0, x+A is printed
+				+ " is: " + poly.syntheticDivision(divisor));
+	}
+	
 	/**
 	 * Receives and interprets a user input string
 	 * 
@@ -533,6 +554,10 @@ public class UserInterface {
 					break;
 				case "show":
 					this.showPoly(input);
+					break;
+				case "synth":
+				case "syntheticdivision":
+					this.printSynth(input);
 					break;
 				case "help":
 				case "?":

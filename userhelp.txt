@@ -57,6 +57,11 @@ _Plot - Plots the polynomial over given x and y bounds
 	graph <optional:function name> [x minimum, x maximum] [y minimum, y maximum]
 ex: plot QuadraticOne [0,5] [-5,5]
 
+_Synthetic Division - Synthetically divide with divisor x-a, where a is the input
+	synth <optional:function name> <value to divide at>
+	syntheticdivision <optional:function name> <value to divide at>
+ex: synth QuadraticOne 2
+
 _Showing a polynomial - Shows the polynomial in its polynomial form
 	show <optional:function name>
 ex: show QuadraticOne

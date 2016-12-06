@@ -263,11 +263,46 @@ public class Polynomial {
 			} else {
 				lowerBound += iterStep;
 			}
-			
 		}
 		return zeros;
 	}
-
+	
+	/**
+	 * Checks to see if all the exponents in the polynomial are all integer values
+	 * @return True if no decimal exponents exist within the polynomial's terms
+	 */
+	public boolean checkIntegerExponents(){
+		for(Term t : this.getTermList()){
+			if(t.getTermData()[Term.EXPONENT_INDEX] != (int)(t.getTermData()[Term.EXPONENT_INDEX])){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * **Non functional!!**
+	 * Finds zeroes more efficiently by finding a zero, factoring out x-zero,
+	 * then recursing until an x-a is left
+	 * 
+	 * @param lowerBound
+	 *            Lower bound to search in
+	 * @param upperBound
+	 *            Upper bound to search from
+	 * @return
+	 */
+	public ArrayList<Double> findZeroesInBoundSmart(double lowerBound, double upperBound){ //
+		ArrayList<Double> zeroes = new ArrayList<Double>();
+		Polynomial dupli = new Polynomial(this.name + "_duplicate", this.getTermList());
+		double zero = 0;
+		while(dupli.getTermList().get(0).getTermData()[Term.EXPONENT_INDEX] > 1){
+			zero = this.findZeroNewtonsFirst(lowerBound, NEWTONS_METHOD_ITERATIONS);
+			dupli = dupli.syntheticDivision(zero);
+			zeroes.add(zero);
+		}
+		return zeroes;
+	}
+	
 	/**
 	 * The first "step" of Newton's method, this iterates the algorithm
 	 * 
@@ -370,11 +405,9 @@ public class Polynomial {
 		ArrayList<Term> newTerms = new ArrayList<Term>();
 		double[] coeffs = new double[(int)this.termList.get(0).getTermData()[Term.EXPONENT_INDEX]+1];
 		double[] newCoeffs = new double[coeffs.length];
-		for(Term t : this.termList){
-			if(t.getTermData()[Term.CONSTANT_INDEX] != (int)(t.getTermData()[Term.CONSTANT_INDEX])){
-				System.out.println("Decimal exponent present, cannot synthetically divide");
-				return null;
-			}
+		if(!this.checkIntegerExponents()){
+			System.out.println("Decimal exponent present, cannot do synthetic division");
+			return null;
 		}
 		double maxExpo = this.termList.get(0).getTermData()[Term.EXPONENT_INDEX];
 		for(int i = 0; i < coeffs.length; i++){ //coefficients will be set in descending order depending on exponent
@@ -389,7 +422,6 @@ public class Polynomial {
 			if(!exponentMatched){
 				coeffs[i] = 0;
 			}
-			
 		}
 		newCoeffs[0] = coeffs[0];
 		for(int i = 1; i < coeffs.length; i++){
